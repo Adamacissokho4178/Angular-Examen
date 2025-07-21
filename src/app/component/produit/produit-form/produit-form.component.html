@@ -1,0 +1,50 @@
+
+
+<div class="container mt-4">
+
+    <div class="container mt-4">
+        <h3>{{ isEditMode ? 'Modifier un produit' : 'Ajouter un produit' }}</h3>
+      
+        <form [formGroup]="produitForm" (ngSubmit)="onSubmit()">
+          
+            <div class="mb-3">
+                <label for="nom" class="form-label">Nom </label>
+                <input type="text" id="nom" formControlName="nom" class="form-control">
+                <div class="text-danger" *ngIf="produitForm.get('nom')?.invalid && produitForm.get('nom')?.touched">
+                Le nom est requis.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="prix" class="form-label">Prix </label>
+                <input type="text" id="prix" formControlName="prix" class="form-control">
+                <div class="text-danger" *ngIf="produitForm.get('prix')?.invalid && produitForm.get('prix')?.touched">
+                    Le prix ne peut prendre que des chiffres.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="categorie" class="form-label">Catégorie</label>
+                <select id="categorie" class="form-control" formControlName="categorie_id">
+                    <option value="">-- Sélectionnez une catégorie --</option>
+                    <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.nom }}</option>
+                </select>
+                <div class="text-danger" *ngIf="produitForm.get('categorie_id')?.invalid && produitForm.get('categorie_id')?.touched">
+                    La catégorie est requise.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Description</label>
+                <textarea class="form-control" formControlName="description" id="exampleFormControlTextarea1" rows="3"></textarea>
+            </div>
+      
+            <button type="submit" class="btn btn-primary">
+                {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+            </button>
+
+        </form>
+
+    </div>
+      
+</div>

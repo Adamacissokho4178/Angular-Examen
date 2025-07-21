@@ -1,0 +1,23 @@
+
+
+<div class="container mt-4">
+
+    <div class="container mt-4">
+        <h3>{{ isEditMode ? 'Modifier une catégorie' : 'Ajouter une catégorie' }}</h3>
+      
+        <form [formGroup]="categorieForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="nom" class="form-label">Nom de la catégorie</label>
+            <input type="text" id="nom" formControlName="nom" class="form-control">
+            <div class="text-danger" *ngIf="categorieForm.get('nom')?.invalid && categorieForm.get('nom')?.touched">
+              Le nom est requis.
+            </div>
+          </div>
+      
+          <button type="submit" class="btn btn-primary">
+            {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+          </button>
+        </form>
+      </div>
+      
+</div>

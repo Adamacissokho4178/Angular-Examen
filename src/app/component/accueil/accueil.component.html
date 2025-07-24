@@ -1,1 +1,89 @@
-<p>accueil works!</p>
+<!-- Header -->
+<header class="header">
+  <div class="logo">Portail Scolaire</div>
+  <nav class="nav">
+    <a href="#">Accueil</a>
+    <a routerLink="/apropos">À propos</a>
+    <a routerLink="/contact">Contact</a>
+    <button class="btn-connect" (click)="goToLogin()">Se connecter</button>
+    <button class="btn-demo">Obtenir une démo</button>
+  </nav>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Simplifiez la gestion scolaire</h1>
+    <p>Connectez, suivez, réussissez. Une plateforme moderne pour la gestion de votre établissement scolaire.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary">Connexion Élève / Parent</button>
+      <button class="btn btn-secondary">Connexion Administration</button>
+    </div>
+  </div>
+</section>
+
+<!-- Statistiques clés -->
+<section class="stats">
+  <div class="stat-card">
+    <div class="stat-icon"></div>
+    <div>
+      <h2>500+</h2>
+      <p>Élèves</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"></div>
+    <div>
+      <h2>25</h2>
+      <p>Classes</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"></div>
+    <div>
+      <h2>1000+</h2>
+      <p>Bulletins générés</p>
+    </div>
+  </div>
+</section>
+
+<!-- Fonctionnalités -->
+<section class="features">
+  <h2>Fonctionnalités principales</h2>
+  <div class="features-grid">
+    <div class="feature-item">
+      <h3>Gestion des notes</h3>
+      <p>Saisie et calcul automatique des moyennes</p>
+    </div>
+    <div class="feature-item">
+      <h3>Bulletins numériques</h3>
+      <p>Génération et téléchargement en PDF</p>
+    </div>
+    <div class="feature-item">
+      <h3>Communication</h3>
+      <p>Échange transparent avec les familles</p>
+    </div>
+  </div>
+</section>
+
+<!-- Témoignage -->
+<section class="testimonial">
+  <blockquote>
+    "Depuis qu'on utilise ce portail, je suis informé en temps réel des résultats de mes enfants !"
+    <span>– Mme Diallo, Parent</span>
+  </blockquote>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div>
+    Contact : <a href="mailto:contact&#64;ecole.com">contact&#64;ecole.com</a>
+  </div>
+  <div>
+    Mentions légales | Politique de confidentialité
+  </div>
+  <div>
+    Version : 1.0 – Projet étudiant, Juillet 2025
+  </div>
+</footer>
+

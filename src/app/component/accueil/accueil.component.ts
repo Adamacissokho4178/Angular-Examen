@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-accueil',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrl: './accueil.component.css'
 })
 export class AccueilComponent {
+  constructor(private router: Router) {}
 
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
 }

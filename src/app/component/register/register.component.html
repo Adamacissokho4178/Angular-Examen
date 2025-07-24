@@ -1,0 +1,26 @@
+<div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+<div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+  <input formControlName="name" placeholder="Nom complet" required>
+  <div *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" class="error">Nom requis</div>
+
+  <input formControlName="email" type="email" placeholder="Email" required>
+  <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error">Email valide requis</div>
+
+  <input formControlName="password" type="password" placeholder="Mot de passe" required>
+  <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error">Mot de passe (min 6 caractères)</div>
+
+  <select formControlName="role" required>
+    <option value="">Sélectionner un rôle</option>
+    <option value="admin">Administrateur</option>
+    <option value="enseignant">Enseignant</option>
+    <option value="eleve_parent">Élève/Parent</option>
+  </select>
+  <div *ngIf="registerForm.get('role')?.invalid && registerForm.get('role')?.touched" class="error">Rôle requis</div>
+
+  <button type="submit" [disabled]="registerForm.invalid">S'inscrire</button>
+</form>
+<div class="switch-form">
+  <span>Déjà un compte ?</span>
+  <a routerLink="/login">Connectez-vous</a>
+</div> 

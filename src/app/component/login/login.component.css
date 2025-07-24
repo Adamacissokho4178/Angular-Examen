@@ -1,0 +1,77 @@
+.login-form {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #e6f8f8;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px #17988e22;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.login-form input {
+  padding: 0.8rem 1rem;
+  border: 1px solid #5bb1ab;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #c2e4e2;
+  color: #17988e;
+  outline: none;
+  transition: border 0.2s, background 0.2s;
+}
+.login-form input:focus {
+  border: 2px solid #17988e;
+  background: #8ac7c4;
+}
+
+.login-form button {
+  background: #17988e;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.login-form button:disabled {
+  background: #c2e4e2;
+  color: #5bb1ab;
+  cursor: not-allowed;
+}
+.login-form button:hover:not(:disabled) {
+  background: #5bb1ab;
+}
+
+.error {
+  color: #c0392b;
+  font-size: 0.95rem;
+  margin-top: -0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.success {
+  color: #17988e;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.switch-form {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #17988e;
+}
+.switch-form a {
+  color: #5bb1ab;
+  font-weight: 500;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.switch-form a:hover {
+  color: #17988e;
+} 

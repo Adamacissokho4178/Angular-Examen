@@ -38,8 +38,7 @@
             ],
             "styles": [
               "src/styles.css",
-              "https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css",
-              "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+              "https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
             ],
             "scripts": [
             ],

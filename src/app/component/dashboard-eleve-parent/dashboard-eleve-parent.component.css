@@ -1,0 +1,13 @@
+.dashboard-container {
+  max-width: 700px;
+  margin: 3rem auto;
+  background: #e6f8f8;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px #17988e22;
+  padding: 2.5rem 2rem;
+  color: #17988e;
+}
+.dashboard-container h1 {
+  color: #17988e;
+  margin-bottom: 1.5rem;
+}

@@ -1,0 +1,190 @@
+body {
+  background: #e6f8f8;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  color: #116d67;
+}
+
+.header {
+  background: #17988e;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav a:hover {
+  color: #5bb1ab;
+}
+
+.btn-connect, .btn-demo {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-connect {
+  background: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+}
+.btn-connect:hover {
+  background: #5bb1ab;
+  color: #fff;
+  border-color: #5bb1ab;
+}
+
+.btn-demo {
+  background: #5bb1ab;
+  color: #fff;
+}
+.btn-demo:hover {
+  background: #17988e;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  background: #e6f8f8;
+  padding: 3rem 2rem 2rem 2rem;
+  justify-content: flex-start;
+}
+.hero-content h1 {
+  color: #116d67;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.hero-content p {
+  color: #17988e;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #17988e;
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #116d67;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #17988e;
+  border: 2px solid #17988e;
+}
+.btn-secondary:hover {
+  background: #17988e;
+  color: #fff;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 2rem 0;
+}
+.stat-card {
+  background: #c2e4e2;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px #116d6722;
+  padding: 2rem 2.5rem;
+  display: flex;
+  align-items: center;
+  min-width: 200px;
+}
+.stat-icon {
+  width: 32px;
+  height: 32px;
+  background: #5bb1ab;
+  border-radius: 50%;
+  margin-right: 1.2rem;
+}
+
+.features {
+  background: #e6f8f8;
+  margin: 2rem 0;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+.features h2 {
+  color: #116d67;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+.features-grid {
+  display: flex;
+  justify-content: space-around;
+  gap: 2rem;
+}
+.feature-item {
+  flex: 1;
+  max-width: 300px;
+}
+.feature-item h3 {
+  color: #17988e;
+  margin-bottom: 1rem;
+}
+.feature-item p {
+  color: #116d67;
+  line-height: 1.6;
+}
+
+.testimonial {
+  background: #5bb1ab;
+  color: #fff;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 1rem;
+  margin: 2rem 4rem;
+  font-style: italic;
+}
+
+.footer {
+  background: #116d67;
+  color: #fff;
+  text-align: center;
+  padding: 1.5rem 0;
+  margin-top: 2rem;
+  font-size: 1rem;
+}
+.footer a {
+  color: #5bb1ab;
+  text-decoration: underline;
+}

@@ -1,38 +1,38 @@
 
-<div class="container mt-5">
+<div class="my-container">
     
-    <div class="d-flex justify-content-between">
+    <div class="my-flex my-space-between">
         <h2>Produits</h2>
-        <button class="btn btn-primary" [routerLink]="['/produits/ajout']">Ajouter</button>
+        <button class="my-btn my-btn-primary" [routerLink]="['/produits/ajout']">Ajouter</button>
     </div>
 
-    <table class="table">
+    <table class="my-table">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nom</th>
-            <th scope="col">Description</th>
-            <th scope="col">Prix</th>
-            <th scope="col">Catégorie</th>
-            <th class="text-end" scope="col">Action</th>
+            <th>#</th>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Prix</th>
+            <th>Catégorie</th>
+            <th class="my-text-end">Action</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let produit of produits">
-            <th scope="row">{{produit.id}}</th>
+            <th>{{produit.id}}</th>
             <td>{{produit.nom}}</td>
             <td>{{produit.description}}</td>
             <td>{{produit.prix}} FCFA</td>
             <td>{{produit.categorie?.nom}} </td>
-            <td  class="end">
-                <div class="d-flex gap-4">
+            <td class="my-text-end">
+                <div class="my-flex my-gap-4">
                     <button type="button"
-                            class="btn btn-outline-primary btn-sm"
+                            class="my-btn my-btn-outline my-btn-sm"
                             [routerLink]="['/produits/edit', produit.id]">
                     Modifier
                     </button>
 
-                    <button type="button" (click)="delete(produit.id!)" class="btn btn-outline-danger btn-sm">Supprimer</button>
+                    <button type="button" (click)="delete(produit.id!)" class="my-btn my-btn-outline-danger my-btn-sm">Supprimer</button>
                 </div>
             </td>
           </tr>

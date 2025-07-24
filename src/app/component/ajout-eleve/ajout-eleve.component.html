@@ -1,0 +1,16 @@
+<app-ajout-eleve></app-ajout-eleve>
+
+
+<h3>Ajouter un élève</h3>
+
+<form (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+  <input [(ngModel)]="eleve.prenom" name="prenom" placeholder="Prénom" required />
+  <input [(ngModel)]="eleve.nom" name="nom" placeholder="Nom" required />
+  <input [(ngModel)]="eleve.email" name="email" type="email" placeholder="Email" required />
+  <input [(ngModel)]="eleve.date_naissance" name="date_naissance" type="date" required />
+  <input [(ngModel)]="eleve.classe_id" name="classe_id" type="number" placeholder="ID classe" required />
+
+  <input type="file" (change)="onFileChange($event)" required />
+  <button type="submit">Créer l’élève</button>
+</form>
+

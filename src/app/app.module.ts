@@ -18,6 +18,7 @@ import { ContactComponent } from './component/contact/contact.component';
 import { DashboardAdminComponent } from './component/dashboard-admin/dashboard-admin.component';
 import { DashboardEnseignantComponent } from './component/dashboard-enseignant/dashboard-enseignant.component';
 import { DashboardEleveParentComponent } from './component/dashboard-eleve-parent/dashboard-eleve-parent.component';
+import { AjoutEleveComponent } from './component/ajout-eleve/ajout-eleve.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { DashboardEleveParentComponent } from './component/dashboard-eleve-paren
     ContactComponent,
     DashboardAdminComponent,
     DashboardEnseignantComponent,
-    DashboardEleveParentComponent
+    DashboardEleveParentComponent,
+    AjoutEleveComponent
   ],
   imports: [
     BrowserModule,

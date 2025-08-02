@@ -1,0 +1,204 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-chalkboard-teacher me-2"></i>
+            {{ isEditMode ? 'Modifier l\'enseignant' : 'Ajouter un enseignant' }}
+          </h4>
+        </div>
+        
+        <div class="card-body">
+          <!-- Messages de succès -->
+          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ success }}
+            <button type="button" class="btn-close" (click)="success = ''"></button>
+          </div>
+
+          <!-- Messages d'erreur -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''"></button>
+          </div>
+
+          <!-- Indicateur de chargement -->
+          <div *ngIf="loading" class="text-center my-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Traitement en cours...</p>
+          </div>
+
+          <form [formGroup]="enseignantForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+            <div class="row">
+              <!-- Nom -->
+              <div class="col-md-6 mb-3">
+                <label for="nom" class="form-label">
+                  <i class="fas fa-user me-1"></i>Nom *
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="nom" 
+                  formControlName="nom"
+                  [class.is-invalid]="isFieldInvalid('nom')"
+                  [class.is-valid]="enseignantForm.get('nom')?.valid && enseignantForm.get('nom')?.dirty"
+                  placeholder="Entrez le nom"
+                  maxlength="50">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('nom')">
+                  {{ getErrorMessage('nom') }}
+                </div>
+                <div class="valid-feedback" *ngIf="enseignantForm.get('nom')?.valid && enseignantForm.get('nom')?.dirty">
+                  <i class="fas fa-check"></i> Nom valide
+                </div>
+                <small class="form-text text-muted">
+                  {{ (enseignantForm.get('nom')?.value?.length || 0) }}/50 caractères
+                </small>
+              </div>
+
+              <!-- Prénom -->
+              <div class="col-md-6 mb-3">
+                <label for="prenom" class="form-label">
+                  <i class="fas fa-user me-1"></i>Prénom *
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="prenom" 
+                  formControlName="prenom"
+                  [class.is-invalid]="isFieldInvalid('prenom')"
+                  [class.is-valid]="enseignantForm.get('prenom')?.valid && enseignantForm.get('prenom')?.dirty"
+                  placeholder="Entrez le prénom"
+                  maxlength="50">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('prenom')">
+                  {{ getErrorMessage('prenom') }}
+                </div>
+                <div class="valid-feedback" *ngIf="enseignantForm.get('prenom')?.valid && enseignantForm.get('prenom')?.dirty">
+                  <i class="fas fa-check"></i> Prénom valide
+                </div>
+                <small class="form-text text-muted">
+                  {{ (enseignantForm.get('prenom')?.value?.length || 0) }}/50 caractères
+                </small>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">
+                <i class="fas fa-envelope me-1"></i>Adresse email *
+              </label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                formControlName="email"
+                [class.is-invalid]="isFieldInvalid('email')"
+                [class.is-valid]="enseignantForm.get('email')?.valid && enseignantForm.get('email')?.dirty"
+                placeholder="exemple@ecole.fr"
+                maxlength="255">
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
+                {{ getErrorMessage('email') }}
+              </div>
+              <div class="valid-feedback" *ngIf="enseignantForm.get('email')?.valid && enseignantForm.get('email')?.dirty">
+                <i class="fas fa-check"></i> Email valide
+              </div>
+              <small class="form-text text-muted">
+                L'email sera utilisé pour les communications officielles
+              </small>
+            </div>
+
+            <!-- Spécialité -->
+            <div class="mb-3">
+              <label for="specialite" class="form-label">
+                <i class="fas fa-graduation-cap me-1"></i>Spécialité *
+              </label>
+              <select 
+                class="form-select" 
+                id="specialite" 
+                formControlName="specialite"
+                [class.is-invalid]="isFieldInvalid('specialite')"
+                [class.is-valid]="enseignantForm.get('specialite')?.valid && enseignantForm.get('specialite')?.dirty">
+                <option value="">Sélectionnez une spécialité</option>
+                <option *ngFor="let specialite of specialites" [value]="specialite">
+                  {{ specialite }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('specialite')">
+                {{ getErrorMessage('specialite') }}
+              </div>
+              <div class="valid-feedback" *ngIf="enseignantForm.get('specialite')?.valid && enseignantForm.get('specialite')?.dirty">
+                <i class="fas fa-check"></i> Spécialité sélectionnée
+              </div>
+            </div>
+
+            <!-- Téléphone -->
+            <div class="mb-4">
+              <label for="telephone" class="form-label">
+                <i class="fas fa-phone me-1"></i>Numéro de téléphone
+              </label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                id="telephone" 
+                formControlName="telephone"
+                [class.is-invalid]="isFieldInvalid('telephone')"
+                [class.is-valid]="enseignantForm.get('telephone')?.valid && enseignantForm.get('telephone')?.dirty"
+                placeholder="0123456789 ou +33 1 23 45 67 89"
+                maxlength="20"
+                (blur)="validateTelephone()">
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('telephone')">
+                {{ getErrorMessage('telephone') }}
+              </div>
+              <div class="valid-feedback" *ngIf="enseignantForm.get('telephone')?.valid && enseignantForm.get('telephone')?.dirty">
+                <i class="fas fa-check"></i> Téléphone valide
+              </div>
+              <small class="form-text text-muted">
+                Format accepté : 0123456789 ou +33 1 23 45 67 89
+              </small>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <button type="button" class="btn btn-secondary me-2" (click)="cancel()">
+                  <i class="fas fa-arrow-left me-1"></i>Annuler
+                </button>
+                <button type="button" class="btn btn-outline-secondary" (click)="resetForm()">
+                  <i class="fas fa-undo me-1"></i>Réinitialiser
+                </button>
+              </div>
+              
+              <div>
+                <button 
+                  type="submit" 
+                  class="btn btn-primary"
+                  [disabled]="!canSubmit()">
+                  <i class="fas fa-save me-1"></i>
+                  {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm ms-1"></span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Informations supplémentaires -->
+      <div class="card mt-3">
+        <div class="card-body">
+          <h6 class="card-title">
+            <i class="fas fa-info-circle me-2"></i>Informations
+          </h6>
+          <ul class="list-unstyled mb-0">
+            <li><i class="fas fa-asterisk text-danger me-1"></i>Champs obligatoires</li>
+            <li><i class="fas fa-check text-success me-1"></i>Validation en temps réel</li>
+            <li><i class="fas fa-shield-alt text-info me-1"></i>Données sécurisées</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

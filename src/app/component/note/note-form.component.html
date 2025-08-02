@@ -1,0 +1,330 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-star me-2"></i>
+            {{ isEditMode ? 'Modifier la note' : 'Ajouter une note' }}
+          </h4>
+        </div>
+        
+        <div class="card-body">
+          <!-- Messages de succès -->
+          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ success }}
+            <button type="button" class="btn-close" (click)="success = ''"></button>
+          </div>
+
+          <!-- Messages d'erreur -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''"></button>
+          </div>
+
+          <!-- Indicateur de chargement -->
+          <div *ngIf="loading" class="text-center my-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Traitement en cours...</p>
+          </div>
+
+          <form [formGroup]="noteForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+            <div class="row">
+              <!-- Élève -->
+              <div class="col-md-6 mb-3">
+                <label for="eleve_id" class="form-label">
+                  <i class="fas fa-user-graduate me-1"></i>Élève *
+                </label>
+                <select 
+                  class="form-select" 
+                  id="eleve_id" 
+                  formControlName="eleve_id"
+                  [class.is-invalid]="isFieldInvalid('eleve_id')"
+                  [class.is-valid]="noteForm.get('eleve_id')?.valid && noteForm.get('eleve_id')?.dirty">
+                  <option value="">Sélectionner un élève</option>
+                  <option *ngFor="let eleve of eleves" [value]="eleve.id">
+                    {{ getEleveFullName(eleve) }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('eleve_id')">
+                  {{ getErrorMessage('eleve_id') }}
+                </div>
+                <div class="valid-feedback" *ngIf="noteForm.get('eleve_id')?.valid && noteForm.get('eleve_id')?.dirty">
+                  <i class="fas fa-check"></i> Élève sélectionné
+                </div>
+              </div>
+
+              <!-- Matière -->
+              <div class="col-md-6 mb-3">
+                <label for="matiere_id" class="form-label">
+                  <i class="fas fa-book me-1"></i>Matière *
+                </label>
+                <select 
+                  class="form-select" 
+                  id="matiere_id" 
+                  formControlName="matiere_id"
+                  [class.is-invalid]="isFieldInvalid('matiere_id')"
+                  [class.is-valid]="noteForm.get('matiere_id')?.valid && noteForm.get('matiere_id')?.dirty">
+                  <option value="">Sélectionner une matière</option>
+                  <option *ngFor="let matiere of matieres" [value]="matiere.id">
+                    {{ matiere.nom }} ({{ matiere.niveau }} - Coef: {{ matiere.coefficient }})
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('matiere_id')">
+                  {{ getErrorMessage('matiere_id') }}
+                </div>
+                <div class="valid-feedback" *ngIf="noteForm.get('matiere_id')?.valid && noteForm.get('matiere_id')?.dirty">
+                  <i class="fas fa-check"></i> Matière sélectionnée
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Enseignant -->
+              <div class="col-md-6 mb-3">
+                <label for="enseignant_id" class="form-label">
+                  <i class="fas fa-chalkboard-teacher me-1"></i>Enseignant *
+                </label>
+                <select 
+                  class="form-select" 
+                  id="enseignant_id" 
+                  formControlName="enseignant_id"
+                  [class.is-invalid]="isFieldInvalid('enseignant_id')"
+                  [class.is-valid]="noteForm.get('enseignant_id')?.valid && noteForm.get('enseignant_id')?.dirty">
+                  <option value="">Sélectionner un enseignant</option>
+                  <option *ngFor="let enseignant of enseignants" [value]="enseignant.id">
+                    {{ getEnseignantFullName(enseignant) }} ({{ enseignant.specialite }})
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('enseignant_id')">
+                  {{ getErrorMessage('enseignant_id') }}
+                </div>
+                <div class="valid-feedback" *ngIf="noteForm.get('enseignant_id')?.valid && noteForm.get('enseignant_id')?.dirty">
+                  <i class="fas fa-check"></i> Enseignant sélectionné
+                </div>
+              </div>
+
+              <!-- Période -->
+              <div class="col-md-6 mb-3">
+                <label for="periode" class="form-label">
+                  <i class="fas fa-calendar-alt me-1"></i>Période *
+                </label>
+                <select 
+                  class="form-select" 
+                  id="periode" 
+                  formControlName="periode"
+                  [class.is-invalid]="isFieldInvalid('periode')"
+                  [class.is-valid]="noteForm.get('periode')?.valid && noteForm.get('periode')?.dirty">
+                  <option value="">Sélectionner une période</option>
+                  <option *ngFor="let periode of periodes" [value]="periode">
+                    {{ periode.charAt(0).toUpperCase() + periode.slice(1) }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('periode')">
+                  {{ getErrorMessage('periode') }}
+                </div>
+                <div class="valid-feedback" *ngIf="noteForm.get('periode')?.valid && noteForm.get('periode')?.dirty">
+                  <i class="fas fa-check"></i> Période sélectionnée
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Note -->
+              <div class="col-md-4 mb-3">
+                <label for="note" class="form-label">
+                  <i class="fas fa-star me-1"></i>Note *
+                </label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="note" 
+                  formControlName="note"
+                  [class.is-invalid]="isFieldInvalid('note')"
+                  [class.is-valid]="noteForm.get('note')?.valid && noteForm.get('note')?.dirty"
+                  placeholder="15.5"
+                  step="0.5"
+                  min="0"
+                  max="20"
+                  (blur)="validateNote()">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('note')">
+                  {{ getErrorMessage('note') }}
+                </div>
+                <div class="valid-feedback" *ngIf="noteForm.get('note')?.valid && noteForm.get('note')?.dirty">
+                  <i class="fas fa-check"></i> Note valide
+                </div>
+                <small class="form-text text-muted">
+                  Note sur 20 (ex: 15.5)
+                </small>
+              </div>
+
+              <!-- Date d'évaluation -->
+              <div class="col-md-4 mb-3">
+                <label for="date_evaluation" class="form-label">
+                  <i class="fas fa-calendar me-1"></i>Date d'évaluation *
+                </label>
+                <input 
+                  type="date" 
+                  class="form-control" 
+                  id="date_evaluation" 
+                  formControlName="date_evaluation"
+                  [class.is-invalid]="isFieldInvalid('date_evaluation')"
+                  [class.is-valid]="noteForm.get('date_evaluation')?.valid && noteForm.get('date_evaluation')?.dirty"
+                                     [max]="getCurrentDate()">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('date_evaluation')">
+                  {{ getErrorMessage('date_evaluation') }}
+                </div>
+                <div class="valid-feedback" *ngIf="noteForm.get('date_evaluation')?.valid && noteForm.get('date_evaluation')?.dirty">
+                  <i class="fas fa-check"></i> Date valide
+                </div>
+              </div>
+
+              <!-- Note pondérée (calculée automatiquement) -->
+              <div class="col-md-4 mb-3">
+                <label class="form-label">
+                  <i class="fas fa-calculator me-1"></i>Note pondérée
+                </label>
+                <div class="form-control-plaintext">
+                  <span 
+                    *ngIf="getNotePonderee() > 0"
+                    [class]="getNoteBadgeClass(getNotePonderee())"
+                    class="fs-5">
+                    {{ getNotePonderee().toFixed(2) }}
+                  </span>
+                  <span *ngIf="getNotePonderee() === 0" class="text-muted">
+                    Sélectionnez une note et une matière
+                  </span>
+                </div>
+                <small class="form-text text-muted">
+                  Note × Coefficient de la matière
+                </small>
+              </div>
+            </div>
+
+            <!-- Appréciation -->
+            <div class="mb-4">
+              <label for="appreciation" class="form-label">
+                <i class="fas fa-comment me-1"></i>Appréciation
+              </label>
+              <textarea 
+                class="form-control" 
+                id="appreciation" 
+                formControlName="appreciation"
+                [class.is-invalid]="isFieldInvalid('appreciation')"
+                [class.is-valid]="noteForm.get('appreciation')?.valid && noteForm.get('appreciation')?.dirty"
+                rows="3"
+                placeholder="Commentaires sur l'évaluation (optionnel)..."
+                maxlength="500"></textarea>
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('appreciation')">
+                {{ getErrorMessage('appreciation') }}
+              </div>
+              <div class="valid-feedback" *ngIf="noteForm.get('appreciation')?.valid && noteForm.get('appreciation')?.dirty">
+                <i class="fas fa-check"></i> Appréciation valide
+              </div>
+              <small class="form-text text-muted">
+                {{ getAppreciationCharCount() }}/500 caractères
+              </small>
+            </div>
+
+            <!-- Aperçu de la note -->
+            <div class="card mb-4" *ngIf="noteForm.get('note')?.value || noteForm.get('eleve_id')?.value || noteForm.get('matiere_id')?.value">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fas fa-eye me-1"></i>Aperçu de la note
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-md-8">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <strong>Élève:</strong> 
+                        <span *ngIf="getSelectedEleve()">{{ getEleveFullName(getSelectedEleve()) }}</span>
+                        <span *ngIf="!getSelectedEleve()" class="text-muted">Non sélectionné</span>
+                      </div>
+                      <div class="col-md-6">
+                        <strong>Matière:</strong> 
+                        <span *ngIf="getSelectedMatiere()">{{ getSelectedMatiere()?.nom }} ({{ getSelectedMatiere()?.niveau }})</span>
+                        <span *ngIf="!getSelectedMatiere()" class="text-muted">Non sélectionnée</span>
+                      </div>
+                    </div>
+                    <div class="row mt-2">
+                      <div class="col-md-6">
+                        <strong>Enseignant:</strong> 
+                        <span *ngIf="getSelectedEnseignant()">{{ getEnseignantFullName(getSelectedEnseignant()!) }}</span>
+                        <span *ngIf="!getSelectedEnseignant()" class="text-muted">Non sélectionné</span>
+                      </div>
+                      <div class="col-md-6">
+                        <strong>Période:</strong> 
+                        <span *ngIf="noteForm.get('periode')?.value" [class]="getPeriodeBadgeClass(noteForm.get('periode')?.value)">
+                          {{ noteForm.get('periode')?.value }}
+                        </span>
+                        <span *ngIf="!noteForm.get('periode')?.value" class="text-muted">Non sélectionnée</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4 text-end">
+                    <div *ngIf="noteForm.get('note')?.value">
+                      <div class="mb-2">
+                        <span [class]="getNoteBadgeClass(noteForm.get('note')?.value)" class="fs-4">
+                          {{ noteForm.get('note')?.value }}/20
+                        </span>
+                      </div>
+                      <div>
+                        <span class="badge bg-secondary">
+                          {{ getMention(noteForm.get('note')?.value) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <button type="button" class="btn btn-secondary me-2" (click)="cancel()">
+                  <i class="fas fa-arrow-left me-1"></i>Annuler
+                </button>
+                <button type="button" class="btn btn-outline-secondary" (click)="resetForm()">
+                  <i class="fas fa-undo me-1"></i>Réinitialiser
+                </button>
+              </div>
+              
+              <div>
+                <button 
+                  type="submit" 
+                  class="btn btn-primary"
+                  [disabled]="!canSubmit()">
+                  <i class="fas fa-save me-1"></i>
+                  {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+                  <span *ngIf="loading" class="spinner-border spinner-border-sm ms-1"></span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Informations supplémentaires -->
+      <div class="card mt-3">
+        <div class="card-body">
+          <h6 class="card-title">
+            <i class="fas fa-info-circle me-2"></i>Informations
+          </h6>
+          <ul class="list-unstyled mb-0">
+            <li><i class="fas fa-asterisk text-danger me-1"></i>Champs obligatoires</li>
+            <li><i class="fas fa-check text-success me-1"></i>Validation en temps réel</li>
+            <li><i class="fas fa-calculator text-info me-1"></i>Calcul automatique de la note pondérée</li>
+            <li><i class="fas fa-star text-warning me-1"></i>Notes de 0 à 20 avec mentions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

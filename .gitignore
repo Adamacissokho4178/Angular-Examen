@@ -6,6 +6,8 @@
 /.idea/
 .DS_Store
 *.log
+.env
+.env.* 
 
 # Environnements locaux
 /src/environments/environment.*.ts

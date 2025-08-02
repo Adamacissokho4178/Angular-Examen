@@ -12,6 +12,8 @@ import { ContactComponent } from './component/contact/contact.component';
 import { DashboardAdminComponent } from './component/dashboard-admin/dashboard-admin.component';
 import { DashboardEnseignantComponent } from './component/dashboard-enseignant/dashboard-enseignant.component';
 import { DashboardEleveParentComponent } from './component/dashboard-eleve-parent/dashboard-eleve-parent.component';
+import { EleveFormComponent } from './component/eleve-form/eleve-form.component';
+import { AffectationFormComponent } from './component/affectation-form/affectation-form.component';
 
 const routes: Routes = [
   { path: '', component: AccueilComponent},
@@ -30,6 +32,8 @@ const routes: Routes = [
   { path: 'dashboard-admin', component: DashboardAdminComponent },
   { path: 'dashboard-enseignant', component: DashboardEnseignantComponent },
   { path: 'dashboard-eleve-parent', component: DashboardEleveParentComponent },
+  { path: 'ajout-eleve', component: EleveFormComponent },
+  { path: 'affectation', component: AffectationFormComponent },
 ];
 
 @NgModule({

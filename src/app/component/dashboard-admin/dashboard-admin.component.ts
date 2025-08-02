@@ -6,5 +6,6 @@ import { Component } from '@angular/core';
   styleUrl: './dashboard-admin.component.css'
 })
 export class DashboardAdminComponent {
+  showAffectation = false; 
 
 }

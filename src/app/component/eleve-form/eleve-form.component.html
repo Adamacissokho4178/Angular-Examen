@@ -1,0 +1,50 @@
+<div class="eleve-form-container">
+  <form [formGroup]="eleveForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+    <label>
+      Prénom:
+      <input formControlName="prenom" type="text">
+    </label><br>
+
+    <label>
+      Nom:
+      <input formControlName="nom" type="text">
+    </label><br>
+
+    <label>
+      Email:
+      <input formControlName="email" type="email">
+    </label><br>
+
+    <label>
+      Date de naissance:
+      <input formControlName="date_naissance" type="date">
+    </label><br>
+
+    <label>
+      Classe:
+      <select formControlName="classe_nom">
+  <option value="" disabled selected>-- Choisir une classe --</option>
+  <option *ngFor="let classe of listeClasses" [value]="classe">{{ classe }}</option>
+</select>
+
+    </label><br>
+
+    <label>
+      Document justificatif:
+      <input type="file" (change)="onFileChange($event)">
+    </label><br>
+
+    <button type="submit" [disabled]="eleveForm.invalid">Ajouter l’élève</button>
+  </form>
+
+  <!-- Message de succès -->
+  <div *ngIf="identifiantGenere" style="margin-top: 15px;" class="alert alert-success">
+     Élève ajouté avec succès !<br>
+    Son identifiant est : <strong>{{ identifiantGenere }}</strong>
+  </div>
+
+  <!-- Message d’erreur -->
+  <div *ngIf="messageErreur" style="margin-top: 15px;" class="alert alert-danger">
+     {{ messageErreur }}
+  </div>
+</div>

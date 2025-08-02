@@ -18,6 +18,9 @@ import { ContactComponent } from './component/contact/contact.component';
 import { DashboardAdminComponent } from './component/dashboard-admin/dashboard-admin.component';
 import { DashboardEnseignantComponent } from './component/dashboard-enseignant/dashboard-enseignant.component';
 import { DashboardEleveParentComponent } from './component/dashboard-eleve-parent/dashboard-eleve-parent.component';
+import { EleveFormComponent } from './component/eleve-form/eleve-form.component';
+import { HttpClientModule } from '@angular/common/http';
+import { AffectationFormComponent } from './component/affectation-form/affectation-form.component';
 
 @NgModule({
   declarations: [
@@ -34,11 +37,14 @@ import { DashboardEleveParentComponent } from './component/dashboard-eleve-paren
     ContactComponent,
     DashboardAdminComponent,
     DashboardEnseignantComponent,
-    DashboardEleveParentComponent
+    DashboardEleveParentComponent,
+    EleveFormComponent,
+    AffectationFormComponent
   ],
   imports: [
     BrowserModule,
     ReactiveFormsModule,
+    HttpClientModule,
     AppRoutingModule
   ],
   providers: [

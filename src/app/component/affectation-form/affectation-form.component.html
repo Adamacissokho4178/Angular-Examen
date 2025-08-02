@@ -1,0 +1,23 @@
+<div class="affectation-form-container">
+  <form [formGroup]="affectationForm" (ngSubmit)="onSubmit()">
+    <label>Enseignant :
+      <select formControlName="enseignant_id">
+        <option value="">Sélectionner un enseignant</option>
+        <option *ngFor="let ens of enseignants" [value]="ens.id">{{ ens.nom }} {{ ens.prenom }}</option>
+      </select>
+    </label><br>
+    <label>Matière :
+      <select formControlName="matiere_id">
+        <option value="">Sélectionner une matière</option>
+        <option *ngFor="let mat of matieres" [value]="mat.id">{{ mat.nom }}</option>
+      </select>
+    </label><br>
+    <label>Classe :
+      <select formControlName="classe_nom">
+        <option value="">Sélectionner une classe</option>
+        <option *ngFor="let classe of classes" [value]="classe.nom">{{ classe.nom }}</option>
+      </select>
+    </label><br>
+    <button type="submit" [disabled]="affectationForm.invalid">Affecter</button>
+  </form>
+</div>

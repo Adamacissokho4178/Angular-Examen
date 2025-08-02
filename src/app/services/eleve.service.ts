@@ -10,12 +10,7 @@ export class EleveService {
   constructor(private http: HttpClient) {}
 
   ajouterEleve(formData: FormData) {
-    const token = localStorage.getItem('token'); // Token from login
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-
-    return this.http.post(this.apiUrl, formData, { headers });
+    // Route publique, pas besoin de token pour les tests
+    return this.http.post(this.apiUrl, formData);
   }
 }

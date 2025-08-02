@@ -1,0 +1,336 @@
+<div class="container-fluid mt-4">
+  <!-- En-tête du dashboard -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-1">
+            <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+            {{ getDashboardTitle() }}
+          </h2>
+          <p class="text-muted mb-0">{{ getDashboardDescription() }}</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button 
+            class="btn btn-outline-primary" 
+            (click)="refreshData()"
+            [disabled]="loading">
+            <i class="fas fa-sync-alt me-1"></i>
+            Actualiser
+            <span *ngIf="loading" class="spinner-border spinner-border-sm ms-1"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label for="periodeFilter" class="form-label">
+        <i class="fas fa-calendar me-1"></i>Période
+      </label>
+      <select 
+        id="periodeFilter" 
+        class="form-select" 
+        [(ngModel)]="selectedPeriode"
+        (change)="onPeriodeChange()">
+        <option *ngFor="let periode of periodes" [value]="periode.value">
+          {{ periode.label }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label for="niveauFilter" class="form-label">
+        <i class="fas fa-graduation-cap me-1"></i>Niveau
+      </label>
+      <select 
+        id="niveauFilter" 
+        class="form-select" 
+        [(ngModel)]="selectedNiveau"
+        (change)="onNiveauChange()">
+        <option *ngFor="let niveau of niveaux" [value]="niveau.value">
+          {{ niveau.label }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-3 text-muted">Chargement des données...</p>
+  </div>
+
+  <!-- Contenu du dashboard -->
+  <div *ngIf="!loading && stats">
+    <!-- Cartes de statistiques principales -->
+    <div class="row mb-4">
+      <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center" [class]="getStatCardClass(0)">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+              <i [class]="getStatIcon(0)" class="fs-1 me-3"></i>
+              <div>
+                <h3 class="mb-0">{{ formatNumber(stats.totalNotes) }}</h3>
+                <p class="mb-0">Notes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center" [class]="getStatCardClass(1)">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+              <i [class]="getStatIcon(1)" class="fs-1 me-3"></i>
+              <div>
+                <h3 class="mb-0">{{ formatNumber(stats.totalEleves) }}</h3>
+                <p class="mb-0">Élèves</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center" [class]="getStatCardClass(2)">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+              <i [class]="getStatIcon(2)" class="fs-1 me-3"></i>
+              <div>
+                <h3 class="mb-0">{{ formatNumber(stats.totalMatieres) }}</h3>
+                <p class="mb-0">Matières</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center" [class]="getStatCardClass(3)">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+              <i [class]="getStatIcon(3)" class="fs-1 me-3"></i>
+              <div>
+                <h3 class="mb-0">{{ formatNumber(stats.totalEnseignants) }}</h3>
+                <p class="mb-0">Enseignants</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques de performance -->
+    <div class="row mb-4">
+      <div class="col-lg-4 mb-3">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-line me-2"></i>
+              Performance Générale
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="border-end">
+                  <h4 class="text-success mb-1">{{ stats.moyenneGenerale }}/20</h4>
+                  <small class="text-muted">Moyenne Générale</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <h4 class="text-info mb-1">{{ stats.meilleureNote }}/20</h4>
+                <small class="text-muted">Meilleure Note</small>
+              </div>
+            </div>
+            <hr>
+            <div class="text-center">
+              <h6 class="text-muted">Écart de notes</h6>
+              <div class="progress">
+                <div 
+                  class="progress-bar bg-success" 
+                  [style.width.%]="getProgressPercentage(stats.meilleureNote, 20)">
+                  {{ stats.meilleureNote }}
+                </div>
+                <div 
+                  class="progress-bar bg-warning" 
+                  [style.width.%]="getProgressPercentage(stats.moyenneGenerale, 20)">
+                  {{ stats.moyenneGenerale }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8 mb-3">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-trophy me-2"></i>
+              Top 5 des Matières
+            </h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="stats.topMatieres.length > 0; else noMatieres">
+              <div *ngFor="let matiere of stats.topMatieres; let i = index" class="d-flex align-items-center mb-3">
+                <div class="me-3">
+                  <span class="badge bg-primary fs-6">{{ i + 1 }}</span>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-1">{{ matiere.nom }}</h6>
+                    <span class="badge bg-secondary">Coef: {{ matiere.coefficient }}</span>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div 
+                      class="progress-bar bg-success" 
+                      [style.width.%]="getProgressPercentage(matiere.moyenne, 20)"
+                      [title]="matiere.moyenne + '/20'">
+                    </div>
+                  </div>
+                  <small class="text-muted">{{ matiere.moyenne }}/20</small>
+                </div>
+              </div>
+            </div>
+            <ng-template #noMatieres>
+              <div class="text-center text-muted py-4">
+                <i class="fas fa-book fa-3x mb-3"></i>
+                <p>Aucune donnée disponible</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Répartition des notes et graphiques -->
+    <div class="row">
+      <div class="col-lg-6 mb-3">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+              <i class="fas fa-pie-chart me-2"></i>
+              Répartition par Mention
+            </h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="stats.repartitionNotes.length > 0; else noRepartition">
+              <div *ngFor="let repartition of stats.repartitionNotes" class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span [class]="getMentionBadgeClass(repartition.mention)">
+                    {{ repartition.mention }}
+                  </span>
+                  <small class="text-muted">{{ repartition.count }} notes ({{ repartition.pourcentage }}%)</small>
+                </div>
+                <div class="progress" style="height: 10px;">
+                  <div 
+                    class="progress-bar" 
+                    [style.width.%]="repartition.pourcentage"
+                    [style.background-color]="repartition.couleur">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noRepartition>
+              <div class="text-center text-muted py-4">
+                <i class="fas fa-chart-pie fa-3x mb-3"></i>
+                <p>Aucune donnée disponible</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-3">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-calendar-alt me-2"></i>
+              Notes par Période
+            </h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="getPeriodesCount() > 0; else noPeriodes">
+              <div *ngFor="let periode of periodes; let i = index" class="mb-3">
+                <div *ngIf="periode.value !== 'toutes' && stats.notesParPeriode[periode.value] !== undefined">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge bg-primary">{{ periode.label }}</span>
+                    <small class="text-muted">{{ stats.notesParPeriode[periode.value] }} notes</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div 
+                      class="progress-bar bg-primary" 
+                      [style.width.%]="getProgressPercentage(stats.notesParPeriode[periode.value], getMaxNotesPeriode())">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ng-template #noPeriodes>
+              <div class="text-center text-muted py-4">
+                <i class="fas fa-calendar fa-3x mb-3"></i>
+                <p>Aucune donnée disponible</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations supplémentaires -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card bg-light">
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="fas fa-info-circle me-2"></i>Informations
+            </h6>
+            <div class="row">
+              <div class="col-md-3">
+                <small class="text-muted">
+                  <i class="fas fa-clock me-1"></i>
+                  Dernière mise à jour : {{ getCurrentDate() | date:'short' }}
+                </small>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">
+                  <i class="fas fa-filter me-1"></i>
+                  Filtres actifs : {{ selectedPeriode !== 'toutes' ? 'Période' : '' }} {{ selectedNiveau !== 'tous' ? 'Niveau' : '' }}
+                </small>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">
+                  <i class="fas fa-database me-1"></i>
+                  {{ stats.totalNotes }} notes analysées
+                </small>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">
+                  <i class="fas fa-chart-bar me-1"></i>
+                  Calculs en temps réel
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si pas de données -->
+  <div *ngIf="!loading && !stats" class="text-center my-5">
+    <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+    <h4 class="text-muted">Aucune donnée disponible</h4>
+    <p class="text-muted">Commencez par ajouter des notes pour voir les statistiques</p>
+    <button class="btn btn-primary" routerLink="/notes/add">
+      <i class="fas fa-plus me-1"></i>
+      Ajouter une note
+    </button>
+  </div>
+</div> 

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatiereService, Matiere } from '../../services/matiere.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-matiere-list',
@@ -14,6 +16,11 @@ export class MatiereListComponent implements OnInit {
   searchTerm = '';
   selectedNiveau = '';
   filteredMatieres: Matiere[] = [];
+  showListSection = false; // Initialisé à false
+  showAddForm = false; // Ajouté pour gérer l'affichage du formulaire d'ajout
+  matiereForm: FormGroup; // Formulaire pour l'ajout de matière
+  isEditMode = false; // Mode édition
+  editingMatiereId: number | null = null; // ID de la matière en cours d'édition
 
   // Liste des niveaux disponibles
   niveaux = [
@@ -28,11 +35,33 @@ export class MatiereListComponent implements OnInit {
 
   constructor(
     private matiereService: MatiereService,
-    private router: Router
-  ) { }
+    private router: Router,
+    private authService: AuthService,
+    private fb: FormBuilder
+  ) {
+    // Initialiser le formulaire
+    this.matiereForm = this.fb.group({
+      nom: ['', [Validators.required, Validators.maxLength(100)]],
+      niveau: ['', Validators.required],
+      coefficient: ['', [Validators.required, Validators.min(0.1), Validators.max(10)]],
+      description: ['', Validators.maxLength(1000)]
+    });
+  }
 
   ngOnInit(): void {
+    // Créer un utilisateur admin de test si aucun utilisateur n'est connecté
+    if (!this.authService.isLoggedIn()) {
+      this.authService.createTestAdmin();
+    }
+    
+    // Charger directement les matières
     this.loadMatieres();
+  }
+
+  // Naviguer vers le formulaire d'ajout
+  addMatiere(): void {
+    // Afficher le formulaire d'ajout
+    this.showAddForm = true;
   }
 
   // Charger toutes les matières
@@ -72,36 +101,75 @@ export class MatiereListComponent implements OnInit {
     });
   }
 
-  // Naviguer vers le formulaire d'ajout
-  addMatiere(): void {
-    this.router.navigate(['/matieres/add']);
+  // Voir les détails d'une matière
+  viewMatiere(id: number): void {
+    this.loading = true;
+    this.error = '';
+    
+    this.matiereService.getMatiere(id).subscribe({
+      next: (matiere) => {
+        this.loading = false;
+        // Afficher les détails dans une alerte pour l'instant
+        alert(`Détails de la matière:\n\nNom: ${matiere.nom}\nNiveau: ${matiere.niveau}\nCoefficient: ${matiere.coefficient}\nDescription: ${matiere.description || 'Aucune description'}`);
+      },
+      error: (error) => {
+        this.loading = false;
+        this.error = 'Erreur lors du chargement des détails de la matière';
+        console.error('Erreur:', error);
+      }
+    });
   }
 
   // Naviguer vers le formulaire de modification
   editMatiere(id: number): void {
-    this.router.navigate(['/matieres/edit', id]);
+    this.loading = true;
+    this.error = '';
+    
+    this.matiereService.getMatiere(id).subscribe({
+      next: (matiere) => {
+        this.loading = false;
+        // Remplir le formulaire avec les données de la matière
+        this.matiereForm.patchValue({
+          nom: matiere.nom,
+          niveau: matiere.niveau,
+          coefficient: matiere.coefficient,
+          description: matiere.description || ''
+        });
+        
+        // Afficher le formulaire en mode édition
+        this.showAddForm = true;
+        this.isEditMode = true;
+        this.editingMatiereId = id;
+      },
+      error: (error) => {
+        this.loading = false;
+        this.error = 'Erreur lors du chargement de la matière';
+        console.error('Erreur:', error);
+      }
+    });
   }
 
   // Supprimer une matière
   deleteMatiere(id: number): void {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette matière ?')) {
+      this.loading = true;
+      this.error = '';
+
       this.matiereService.deleteMatiere(id).subscribe({
-        next: () => {
+        next: (response) => {
+          this.loading = false;
+          // Supprimer la matière de la liste locale
           this.matieres = this.matieres.filter(m => m.id !== id);
           this.filteredMatieres = this.filteredMatieres.filter(m => m.id !== id);
           alert('Matière supprimée avec succès');
         },
         error: (error) => {
-          this.error = 'Erreur lors de la suppression';
+          this.loading = false;
+          this.error = 'Erreur lors de la suppression de la matière';
           console.error('Erreur:', error);
         }
       });
     }
-  }
-
-  // Voir les détails d'une matière
-  viewMatiere(id: number): void {
-    this.router.navigate(['/matieres/view', id]);
   }
 
   // Filtrer par niveau
@@ -190,5 +258,97 @@ export class MatiereListComponent implements OnInit {
   getNiveauxCount(): number {
     const stats = this.getStats();
     return Object.keys(stats.byNiveau).length;
+  }
+
+  // Vérifier si un champ est invalide
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.matiereForm.get(fieldName);
+    return field ? field.invalid && (field.dirty || field.touched) : false;
+  }
+
+  // Obtenir le message d'erreur pour un champ
+  getErrorMessage(fieldName: string): string {
+    const field = this.matiereForm.get(fieldName);
+    if (!field) return '';
+
+    if (field.hasError('required')) {
+      return 'Ce champ est obligatoire';
+    }
+    if (field.hasError('maxlength')) {
+      const maxLength = field.getError('maxlength').requiredLength;
+      return `Maximum ${maxLength} caractères`;
+    }
+    if (field.hasError('min')) {
+      return 'La valeur minimum est 0.1';
+    }
+    if (field.hasError('max')) {
+      return 'La valeur maximum est 10';
+    }
+    return 'Champ invalide';
+  }
+
+  // Vérifier si le formulaire peut être soumis
+  canSubmit(): boolean {
+    return this.matiereForm.valid && !this.loading;
+  }
+
+  // Soumettre le formulaire
+  onSubmit(): void {
+    if (this.matiereForm.valid) {
+      this.loading = true;
+      this.error = '';
+
+      const matiereData = this.matiereForm.value;
+      
+      if (this.isEditMode && this.editingMatiereId) {
+        this.matiereService.updateMatiere(this.editingMatiereId, matiereData).subscribe({
+          next: (response: any) => {
+            this.loading = false;
+            // Mettre à jour la matière dans la liste locale
+            const index = this.matieres.findIndex(m => m.id === this.editingMatiereId);
+            if (index !== -1) {
+              this.matieres[index] = response.matiere;
+              this.filteredMatieres = this.matieres;
+            }
+            
+            // Réinitialiser le formulaire et retourner à la liste
+            this.matiereForm.reset();
+            this.showAddForm = false;
+            this.isEditMode = false;
+            this.editingMatiereId = null;
+            
+            alert('Matière modifiée avec succès !');
+          },
+          error: (error) => {
+            this.loading = false;
+            this.error = 'Erreur lors de la modification de la matière : ' + error.message;
+            console.error('Erreur:', error);
+          }
+        });
+      } else {
+        this.matiereService.createMatiere(matiereData).subscribe({
+          next: (response: any) => {
+            this.loading = false;
+            // Ajouter la nouvelle matière à la liste
+            if (response.matiere) {
+              this.matieres.push(response.matiere);
+              this.filteredMatieres = this.matieres;
+            }
+            
+            // Réinitialiser le formulaire et retourner à la liste
+            this.matiereForm.reset();
+            this.showAddForm = false;
+            this.showListSection = true;
+            
+            alert('Matière ajoutée avec succès !');
+          },
+          error: (error) => {
+            this.loading = false;
+            this.error = 'Erreur lors de la création de la matière : ' + error.message;
+            console.error('Erreur:', error);
+          }
+        });
+      }
+    }
   }
 } 

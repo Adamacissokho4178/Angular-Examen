@@ -1,266 +1,150 @@
-<div class="container mt-4">
-  <!-- En-tête avec titre et bouton d'ajout -->
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <h2 class="text-primary">
-        <i class="fas fa-book me-2"></i>
-        Liste des Matières
-      </h2>
-    </div>
-    <div class="col-md-4 text-end">
-      <button class="btn btn-success" (click)="addMatiere()">
-        <i class="fas fa-plus me-2"></i>
-        Ajouter une Matière
+<div class="matiere-container">
+  <!-- Section liste des matières -->
+  <div class="list-section">
+    <!-- En-tête de la liste -->
+    <div class="list-header">
+      <h2>Liste des Matières</h2>
+      <button class="btn-ajouter" (click)="addMatiere()">
+        Ajouter
       </button>
     </div>
-  </div>
 
-  <!-- Statistiques -->
-  <div class="row mb-4" *ngIf="!loading && filteredMatieres.length > 0">
-    <div class="col-12">
-      <div class="card bg-light">
-        <div class="card-body">
-          <div class="row text-center">
-            <div class="col-md-3">
-              <h5 class="text-primary">{{ getStats().total }}</h5>
-              <small class="text-muted">Total Matières</small>
-            </div>
-            <div class="col-md-3">
-              <h5 class="text-success">{{ getStats().avgCoefficient.toFixed(1) }}</h5>
-              <small class="text-muted">Coefficient Moyen</small>
-            </div>
-            <div class="col-md-3">
-              <h5 class="text-info">{{ getNiveauxCount() }}</h5>
-              <small class="text-muted">Niveaux Différents</small>
-            </div>
-            <div class="col-md-3">
-              <h5 class="text-warning">{{ filteredMatieres.length }}</h5>
-              <small class="text-muted">Affichées</small>
-            </div>
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+      <input 
+        type="text" 
+        placeholder="Rechercher une matière..."
+        [(ngModel)]="searchTerm"
+        (input)="searchMatieres()"
+      >
+      <select [(ngModel)]="selectedNiveau" (change)="searchMatieres()">
+        <option value="">Tous les niveaux</option>
+        <option *ngFor="let niveau of niveaux" [value]="niveau">
+          {{ niveau }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Liste des matières -->
+    <div class="matieres-list" *ngIf="!loading && filteredMatieres.length > 0">
+      <div class="matiere-card" *ngFor="let matiere of filteredMatieres">
+        <div class="matiere-info">
+          <h3>{{ matiere.nom }}</h3>
+          <div class="matiere-details">
+            <span class="niveau">{{ matiere.niveau }}</span>
+            <span class="coefficient">Coeff: {{ matiere.coefficient }}</span>
           </div>
+          <p class="description" *ngIf="matiere.description">
+            {{ matiere.description }}
+          </p>
+        </div>
+        <div class="matiere-actions">
+          <button class="btn-voir" (click)="viewMatiere(matiere.id!)">
+            Voir plus
+          </button>
+          <button class="btn-modifier" (click)="editMatiere(matiere.id!)">
+            Modifier
+          </button>
+          <button class="btn-supprimer" (click)="deleteMatiere(matiere.id!)">
+            Supprimer
+          </button>
         </div>
       </div>
     </div>
+
+    <!-- Message si aucune matière -->
+    <div class="empty-state" *ngIf="!loading && filteredMatieres.length === 0">
+      <p>Aucune matière trouvée</p>
+      <button class="btn-ajouter" (click)="addMatiere()">
+        Ajouter une matière
+      </button>
+    </div>
+
+    <!-- Chargement -->
+    <div class="loading" *ngIf="loading">
+      <p>Chargement...</p>
+    </div>
   </div>
 
-  <!-- Barre de recherche et filtres -->
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="input-group">
-        <span class="input-group-text">
-          <i class="fas fa-search"></i>
-        </span>
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Rechercher par nom ou description..."
-          [(ngModel)]="searchTerm"
-          (input)="searchMatieres()"
-        >
-        <button
-          class="btn btn-outline-secondary"
-          type="button"
-          (click)="resetFilters()"
-          *ngIf="searchTerm || selectedNiveau"
-        >
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
+  <!-- Section formulaire d'ajout -->
+  <div class="form-section" *ngIf="showAddForm">
+    <!-- En-tête du formulaire -->
+    <div class="form-header">
+      <h2>{{ isEditMode ? 'Modifier la matière' : 'Ajouter une matière' }}</h2>
+      <button class="btn-retour" (click)="showAddForm = false; showListSection = true; isEditMode = false; editingMatiereId = null; matiereForm.reset()">
+        Retour à la liste
+      </button>
     </div>
-    <div class="col-md-6">
-      <div class="d-flex gap-2 flex-wrap">
-        <select
-          class="form-select"
-          [(ngModel)]="selectedNiveau"
-          (change)="searchMatieres()"
-          style="max-width: 150px;"
-        >
-          <option value="">Tous les niveaux</option>
+
+    <!-- Formulaire d'ajout -->
+    <form [formGroup]="matiereForm" (ngSubmit)="onSubmit()" class="matiere-form">
+      <!-- Nom de la matière -->
+      <div class="form-group">
+        <label for="nom">Nom de la matière *</label>
+        <input 
+          type="text" 
+          id="nom" 
+          formControlName="nom"
+          placeholder="Ex: Mathématiques, Français, Histoire..."
+          maxlength="100">
+        <div class="error-message" *ngIf="isFieldInvalid('nom')">
+          {{ getErrorMessage('nom') }}
+        </div>
+      </div>
+
+      <!-- Niveau -->
+      <div class="form-group">
+        <label for="niveau">Niveau *</label>
+        <select id="niveau" formControlName="niveau">
+          <option value="">Sélectionner un niveau</option>
           <option *ngFor="let niveau of niveaux" [value]="niveau">
             {{ niveau }}
           </option>
         </select>
-        <button class="btn btn-outline-primary btn-sm" (click)="sortByName()">
-          <i class="fas fa-sort-alpha-down me-1"></i>
-          Nom
-        </button>
-        <button class="btn btn-outline-info btn-sm" (click)="sortByNiveau()">
-          <i class="fas fa-sort me-1"></i>
-          Niveau
-        </button>
-        <button class="btn btn-outline-warning btn-sm" (click)="sortByCoefficient()">
-          <i class="fas fa-sort-numeric-down me-1"></i>
-          Coeff
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Message d'erreur -->
-  <div class="alert alert-danger" *ngIf="error">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    {{ error }}
-  </div>
-
-  <!-- Indicateur de chargement -->
-  <div class="text-center" *ngIf="loading">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Chargement...</span>
-    </div>
-    <p class="mt-2">Chargement des matières...</p>
-  </div>
-
-  <!-- Liste des matières -->
-  <div class="row" *ngIf="!loading && filteredMatieres.length > 0">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">
-            <i class="fas fa-list me-2"></i>
-            Matières ({{ filteredMatieres.length }})
-          </h5>
-        </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Matière</th>
-                  <th>Niveau</th>
-                  <th>Coefficient</th>
-                  <th>Description</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let matiere of filteredMatieres">
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="matiere-icon me-3">
-                        <i class="fas fa-book fa-2x text-primary"></i>
-                      </div>
-                      <div>
-                        <strong>{{ matiere.nom }}</strong>
-                        <br>
-                        <small class="text-muted">ID: {{ matiere.id }}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge" [ngClass]="getNiveauBadgeClass(matiere.niveau)">
-                      {{ matiere.niveau }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge" [ngClass]="getCoefficientBadgeClass(matiere.coefficient)">
-                      {{ matiere.coefficient }}
-                    </span>
-                  </td>
-                  <td>
-                    <span *ngIf="hasDescription(matiere)" class="text-muted">
-                      {{ getDescriptionPreview(matiere.description!) }}
-                    </span>
-                    <span *ngIf="!hasDescription(matiere)" class="text-muted">
-                      <i class="fas fa-minus me-1"></i>
-                      Aucune description
-                    </span>
-                  </td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      <button
-                        class="btn btn-outline-primary btn-sm"
-                        (click)="viewMatiere(matiere.id!)"
-                        title="Voir les détails"
-                      >
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button
-                        class="btn btn-outline-warning btn-sm"
-                        (click)="editMatiere(matiere.id!)"
-                        title="Modifier"
-                      >
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button
-                        class="btn btn-outline-danger btn-sm"
-                        (click)="deleteMatiere(matiere.id!)"
-                        title="Supprimer"
-                      >
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="error-message" *ngIf="isFieldInvalid('niveau')">
+          {{ getErrorMessage('niveau') }}
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Message si aucune matière -->
-  <div class="text-center mt-4" *ngIf="!loading && filteredMatieres.length === 0">
-    <div class="card">
-      <div class="card-body">
-        <i class="fas fa-books fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">Aucune matière trouvée</h5>
-        <p class="text-muted">
-          {{ searchTerm || selectedNiveau ? 'Aucune matière ne correspond à vos critères.' : 'Aucune matière n\'a été ajoutée pour le moment.' }}
-        </p>
-        <button
-          class="btn btn-primary"
-          (click)="addMatiere()"
-          *ngIf="!searchTerm && !selectedNiveau"
-        >
-          <i class="fas fa-plus me-2"></i>
-          Ajouter la première matière
-        </button>
-        <button
-          class="btn btn-outline-secondary"
-          (click)="resetFilters()"
-          *ngIf="searchTerm || selectedNiveau"
-        >
-          <i class="fas fa-times me-2"></i>
-          Effacer les filtres
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filtres rapides par niveau -->
-  <div class="row mt-4" *ngIf="!loading && matieres.length > 0">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h6 class="mb-0">
-            <i class="fas fa-filter me-2"></i>
-            Filtres Rapides par Niveau
-          </h6>
-        </div>
-        <div class="card-body">
-          <div class="d-flex gap-2 flex-wrap">
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              (click)="resetFilters()"
-              [class.active]="!selectedNiveau"
-            >
-              Tous
-            </button>
-            <button
-              *ngFor="let niveau of niveaux"
-              class="btn btn-outline-secondary btn-sm"
-              (click)="filterByNiveau(niveau)"
-              [class.active]="selectedNiveau === niveau"
-            >
-              {{ niveau }}
-              <span class="badge bg-secondary ms-1">
-                {{ getStats().byNiveau[niveau] || 0 }}
-              </span>
-            </button>
-          </div>
+      <!-- Coefficient -->
+      <div class="form-group">
+        <label for="coefficient">Coefficient *</label>
+        <input 
+          type="number" 
+          id="coefficient" 
+          formControlName="coefficient"
+          placeholder="1.0"
+          step="0.1"
+          min="0.1"
+          max="10">
+        <div class="error-message" *ngIf="isFieldInvalid('coefficient')">
+          {{ getErrorMessage('coefficient') }}
         </div>
       </div>
-    </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea 
+          id="description" 
+          formControlName="description"
+          rows="4"
+          placeholder="Description optionnelle de la matière..."
+          maxlength="1000"></textarea>
+        <div class="error-message" *ngIf="isFieldInvalid('description')">
+          {{ getErrorMessage('description') }}
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="form-actions">
+        <button type="button" class="btn-annuler" (click)="showAddForm = false; showListSection = true; isEditMode = false; editingMatiereId = null; matiereForm.reset()">
+          Annuler
+        </button>
+        <button type="submit" class="btn-ajouter" [disabled]="!canSubmit()">
+          {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div> 

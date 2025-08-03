@@ -1,197 +1,160 @@
-<div class="container mt-4">
-  <!-- En-tête avec titre et bouton d'ajout -->
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <h2 class="text-primary">
-        <i class="fas fa-chalkboard-teacher me-2"></i>
-        Liste des Enseignants
-      </h2>
-    </div>
-    <div class="col-md-4 text-end">
-      <button class="btn btn-success" (click)="addEnseignant()">
-        <i class="fas fa-plus me-2"></i>
-        Ajouter un Enseignant
+<div class="enseignant-container">
+  <!-- Section liste des enseignants -->
+  <div class="list-section">
+    <!-- En-tête de la liste -->
+    <div class="list-header">
+      <h2>Liste des Enseignants</h2>
+      <button class="btn-ajouter" (click)="addEnseignant()">
+        Ajouter
       </button>
     </div>
+
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+      <input 
+        type="text" 
+        placeholder="Rechercher un enseignant..."
+        [(ngModel)]="searchTerm"
+        (input)="searchEnseignants()"
+      >
+      <select [(ngModel)]="selectedSpecialite" (change)="searchEnseignants()">
+        <option value="">Toutes les spécialités</option>
+        <option *ngFor="let specialite of specialites" [value]="specialite">
+          {{ specialite }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Liste des enseignants -->
+    <div class="enseignants-list" *ngIf="!loading && filteredEnseignants.length > 0">
+      <div class="enseignant-card" *ngFor="let enseignant of filteredEnseignants">
+        <div class="enseignant-info">
+          <h3>{{ enseignant.nom }} {{ enseignant.prenom }}</h3>
+          <div class="enseignant-details">
+            <span class="specialite">{{ enseignant.specialite }}</span>
+            <span class="email">{{ enseignant.email }}</span>
+          </div>
+          <p class="telephone" *ngIf="enseignant.telephone">
+            Tél: {{ enseignant.telephone }}
+          </p>
+        </div>
+        <div class="enseignant-actions">
+          <button class="btn-voir" (click)="viewEnseignant(enseignant.id!)">
+            Voir plus
+          </button>
+          <button class="btn-modifier" (click)="editEnseignant(enseignant.id!)">
+            Modifier
+          </button>
+          <button class="btn-supprimer" (click)="deleteEnseignant(enseignant.id!)">
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucun enseignant -->
+    <div class="empty-state" *ngIf="!loading && filteredEnseignants.length === 0">
+      <p>Aucun enseignant trouvé</p>
+      <button class="btn-ajouter" (click)="addEnseignant()">
+        Ajouter un enseignant
+      </button>
+    </div>
+
+    <!-- Chargement -->
+    <div class="loading" *ngIf="loading">
+      <p>Chargement...</p>
+    </div>
   </div>
 
-  <!-- Barre de recherche -->
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <div class="input-group">
-        <span class="input-group-text">
-          <i class="fas fa-search"></i>
-        </span>
+  <!-- Section formulaire d'ajout -->
+  <div class="form-section" *ngIf="showAddForm">
+    <!-- En-tête du formulaire -->
+    <div class="form-header">
+      <h2>{{ isEditMode ? 'Modifier l\'enseignant' : 'Ajouter un enseignant' }}</h2>
+      <button class="btn-retour" (click)="showAddForm = false; showListSection = true; isEditMode = false; editingEnseignantId = null; enseignantForm.reset()">
+        Retour à la liste
+      </button>
+    </div>
+
+    <!-- Formulaire d'ajout -->
+    <form [formGroup]="enseignantForm" (ngSubmit)="onSubmit()" class="enseignant-form">
+      <!-- Nom -->
+      <div class="form-group">
+        <label for="nom">Nom *</label>
         <input 
           type="text" 
-          class="form-control" 
-          placeholder="Rechercher par nom, prénom, spécialité ou email..."
-          [(ngModel)]="searchTerm"
-          (input)="searchEnseignants()"
-        >
-        <button 
-          class="btn btn-outline-secondary" 
-          type="button"
-          (click)="resetSearch()"
-          *ngIf="searchTerm"
-        >
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="d-flex gap-2">
-        <button 
-          class="btn btn-outline-primary btn-sm"
-          (click)="searchBySpecialite('Mathématiques')"
-        >
-          Mathématiques
-        </button>
-        <button 
-          class="btn btn-outline-primary btn-sm"
-          (click)="searchBySpecialite('Français')"
-        >
-          Français
-        </button>
-        <button 
-          class="btn btn-outline-primary btn-sm"
-          (click)="searchBySpecialite('Anglais')"
-        >
-          Anglais
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Message d'erreur -->
-  <div class="alert alert-danger" *ngIf="error">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    {{ error }}
-  </div>
-
-  <!-- Indicateur de chargement -->
-  <div class="text-center" *ngIf="loading">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Chargement...</span>
-    </div>
-    <p class="mt-2">Chargement des enseignants...</p>
-  </div>
-
-  <!-- Liste des enseignants -->
-  <div class="row" *ngIf="!loading && filteredEnseignants.length > 0">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">
-            <i class="fas fa-list me-2"></i>
-            Enseignants ({{ filteredEnseignants.length }})
-          </h5>
-        </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Nom Complet</th>
-                  <th>Spécialité</th>
-                  <th>Email</th>
-                  <th>Téléphone</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let enseignant of filteredEnseignants">
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="avatar me-3">
-                        <i class="fas fa-user-circle fa-2x text-primary"></i>
-                      </div>
-                      <div>
-                        <strong>{{ getFullName(enseignant) }}</strong>
-                        <br>
-                        <small class="text-muted">ID: {{ enseignant.id }}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge bg-info">{{ enseignant.specialite }}</span>
-                  </td>
-                  <td>
-                    <a href="mailto:{{ enseignant.email }}" class="text-decoration-none">
-                      <i class="fas fa-envelope me-1"></i>
-                      {{ enseignant.email }}
-                    </a>
-                  </td>
-                  <td>
-                    <span *ngIf="hasTelephone(enseignant)">
-                      <i class="fas fa-phone me-1"></i>
-                      {{ enseignant.telephone }}
-                    </span>
-                    <span *ngIf="!hasTelephone(enseignant)" class="text-muted">
-                      <i class="fas fa-phone-slash me-1"></i>
-                      Non renseigné
-                    </span>
-                  </td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      <button 
-                        class="btn btn-outline-primary btn-sm"
-                        (click)="viewEnseignant(enseignant.id!)"
-                        title="Voir les détails"
-                      >
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button 
-                        class="btn btn-outline-warning btn-sm"
-                        (click)="editEnseignant(enseignant.id!)"
-                        title="Modifier"
-                      >
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button 
-                        class="btn btn-outline-danger btn-sm"
-                        (click)="deleteEnseignant(enseignant.id!)"
-                        title="Supprimer"
-                      >
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          id="nom" 
+          formControlName="nom"
+          placeholder="Ex: Dupont, Martin..."
+          maxlength="50">
+        <div class="error-message" *ngIf="isFieldInvalid('nom')">
+          {{ getErrorMessage('nom') }}
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Message si aucun enseignant -->
-  <div class="text-center mt-4" *ngIf="!loading && filteredEnseignants.length === 0">
-    <div class="card">
-      <div class="card-body">
-        <i class="fas fa-users fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">Aucun enseignant trouvé</h5>
-        <p class="text-muted">
-          {{ searchTerm ? 'Aucun enseignant ne correspond à votre recherche.' : 'Aucun enseignant n\'a été ajouté pour le moment.' }}
-        </p>
-        <button 
-          class="btn btn-primary"
-          (click)="addEnseignant()"
-          *ngIf="!searchTerm"
-        >
-          <i class="fas fa-plus me-2"></i>
-          Ajouter le premier enseignant
+      <!-- Prénom -->
+      <div class="form-group">
+        <label for="prenom">Prénom *</label>
+        <input 
+          type="text" 
+          id="prenom" 
+          formControlName="prenom"
+          placeholder="Ex: Jean, Marie..."
+          maxlength="50">
+        <div class="error-message" *ngIf="isFieldInvalid('prenom')">
+          {{ getErrorMessage('prenom') }}
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          placeholder="Ex: jean.dupont@ecole.fr">
+        <div class="error-message" *ngIf="isFieldInvalid('email')">
+          {{ getErrorMessage('email') }}
+        </div>
+      </div>
+
+      <!-- Téléphone -->
+      <div class="form-group">
+        <label for="telephone">Téléphone</label>
+        <input 
+          type="tel" 
+          id="telephone" 
+          formControlName="telephone"
+          placeholder="Ex: 0123456789">
+        <div class="error-message" *ngIf="isFieldInvalid('telephone')">
+          {{ getErrorMessage('telephone') }}
+        </div>
+      </div>
+
+      <!-- Spécialité -->
+      <div class="form-group">
+        <label for="specialite">Spécialité *</label>
+        <select id="specialite" formControlName="specialite">
+          <option value="">Sélectionner une spécialité</option>
+          <option *ngFor="let specialite of specialites" [value]="specialite">
+            {{ specialite }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="isFieldInvalid('specialite')">
+          {{ getErrorMessage('specialite') }}
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="form-actions">
+        <button type="button" class="btn-annuler" (click)="showAddForm = false; showListSection = true; isEditMode = false; editingEnseignantId = null; enseignantForm.reset()">
+          Annuler
         </button>
-        <button 
-          class="btn btn-outline-secondary"
-          (click)="resetSearch()"
-          *ngIf="searchTerm"
-        >
-          <i class="fas fa-times me-2"></i>
-          Effacer la recherche
+        <button type="submit" class="btn-ajouter" [disabled]="!canSubmit()">
+          {{ isEditMode ? 'Modifier' : 'Ajouter' }}
         </button>
       </div>
-    </div>
+    </form>
   </div>
 </div> 

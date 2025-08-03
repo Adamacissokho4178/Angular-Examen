@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
 export interface User {
   id: number;
@@ -11,7 +13,27 @@ export interface User {
   classe?: string; // Pour les élèves
 }
 
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
 
+export interface RegisterRequest {
+  nom: string;
+  prenom: string;
+  email: string;
+  password: string;
+  role: 'admin' | 'enseignant' | 'eleve' | 'parent';
+  specialite?: string;
+  classe?: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  user: User;
+  token: string;
+  message?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -19,23 +41,60 @@ export interface User {
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private apiUrl = 'http://localhost:8000/api';
 
-  constructor() {
-    // Simuler un utilisateur connecté (à remplacer par l'authentification réelle)
-    this.setCurrentUser({
+  constructor(private http: HttpClient) {
+    // Vérifier si localStorage est disponible (côté client uniquement)
+    if (typeof window !== 'undefined' && window.localStorage) {
+      // Essayer de récupérer l'utilisateur depuis localStorage
+      const savedUser = localStorage.getItem('currentUser');
+      const savedToken = localStorage.getItem('authToken');
+      
+      if (savedUser && savedToken) {
+        try {
+          const user = JSON.parse(savedUser);
+          this.currentUserSubject.next(user);
+        } catch (error) {
+          console.error('Erreur lors du parsing de l\'utilisateur:', error);
+        }
+      }
+    }
+  }
+
+  // Méthode pour créer un utilisateur admin de test (pour développement)
+  createTestAdmin(): void {
+    const testUser: User = {
       id: 1,
-      nom: 'Dupont',
-      prenom: 'Jean',
-      email: 'jean.dupont@ecole.fr',
-      role: 'enseignant',
-      specialite: 'Mathématiques'
-    });
+      nom: 'Admin',
+      prenom: 'Test',
+      email: 'admin@ecole.fr',
+      role: 'admin',
+      specialite: 'Administration'
+    };
+    
+    const testToken = 'test-token-12345';
+    
+    this.setCurrentUser(testUser);
+    this.setToken(testToken);
+  }
+
+  // Méthode de connexion
+  login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials);
+  }
+
+  // Méthode d'inscription
+  register(userData: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData);
   }
 
   // Définir l'utilisateur actuel
   setCurrentUser(user: User): void {
     this.currentUserSubject.next(user);
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    // Vérifier si localStorage est disponible avant de l'utiliser
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }
   }
 
   // Obtenir l'utilisateur actuel
@@ -43,9 +102,24 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  // Obtenir le token d'authentification
+  getToken(): string | null {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem('authToken');
+    }
+    return null;
+  }
+
+  // Définir le token d'authentification
+  setToken(token: string): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('authToken', token);
+    }
+  }
+
   // Vérifier si l'utilisateur est connecté
   isLoggedIn(): boolean {
-    return this.currentUserSubject.value !== null;
+    return this.currentUserSubject.value !== null && this.getToken() !== null;
   }
 
   // Vérifier le rôle de l'utilisateur
@@ -63,7 +137,11 @@ export class AuthService {
   // Déconnexion
   logout(): void {
     this.currentUserSubject.next(null);
-    localStorage.removeItem('currentUser');
+    // Vérifier si localStorage est disponible avant de l'utiliser
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
+    }
   }
 
   // Méthodes simples pour vérifier le rôle

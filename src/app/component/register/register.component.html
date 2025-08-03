@@ -1,8 +1,11 @@
 <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
 <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
 <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
-  <input formControlName="name" placeholder="Nom complet" required>
-  <div *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" class="error">Nom requis</div>
+  <input formControlName="nom" placeholder="Nom" required>
+  <div *ngIf="registerForm.get('nom')?.invalid && registerForm.get('nom')?.touched" class="error">Nom requis</div>
+
+  <input formControlName="prenom" placeholder="Prénom" required>
+  <div *ngIf="registerForm.get('prenom')?.invalid && registerForm.get('prenom')?.touched" class="error">Prénom requis</div>
 
   <input formControlName="email" type="email" placeholder="Email" required>
   <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error">Email valide requis</div>
@@ -14,11 +17,14 @@
     <option value="">Sélectionner un rôle</option>
     <option value="admin">Administrateur</option>
     <option value="enseignant">Enseignant</option>
-    <option value="eleve_parent">Élève/Parent</option>
+    <option value="eleve">Élève</option>
+    <option value="parent">Parent</option>
   </select>
   <div *ngIf="registerForm.get('role')?.invalid && registerForm.get('role')?.touched" class="error">Rôle requis</div>
 
-  <button type="submit" [disabled]="registerForm.invalid">S'inscrire</button>
+  <button type="submit" [disabled]="registerForm.invalid || isLoading">
+    {{ isLoading ? 'Inscription en cours...' : 'S\'inscrire' }}
+  </button>
 </form>
 <div class="switch-form">
   <span>Déjà un compte ?</span>

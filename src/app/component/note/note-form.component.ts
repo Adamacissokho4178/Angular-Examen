@@ -169,24 +169,19 @@ export class NoteFormComponent implements OnInit {
     this.success = '';
 
     this.noteService.getNote(id).subscribe({
-      next: (note) => {
+      next: (note: any) => {
         this.noteForm.patchValue({
           eleve_id: note.eleve_id,
           matiere_id: note.matiere_id,
+          classe_id: note.classe_id,
           enseignant_id: note.enseignant_id,
           note: note.note,
-          periode: note.periode,
-          appreciation: note.appreciation || '',
-          date_evaluation: this.formatDateForInput(note.date_evaluation)
+          appreciation: note.appreciation,
+          periode: note.periode
         });
-        this.loading = false;
-        this.notificationService.success('Note chargée avec succès');
       },
-      error: (error) => {
-        this.error = 'Erreur lors du chargement de la note';
-        this.loading = false;
-        this.notificationService.crudError('load', 'la note', error);
-        console.error('Erreur:', error);
+      error: (error: any) => {
+        console.error('Erreur lors du chargement de la note:', error);
       }
     });
   }
@@ -205,45 +200,36 @@ export class NoteFormComponent implements OnInit {
       this.error = '';
       this.success = '';
 
-      const noteData: Note = {
+      const noteData = {
         eleve_id: this.noteForm.value.eleve_id,
         matiere_id: this.noteForm.value.matiere_id,
+        classe_id: this.noteForm.value.classe_id,
         enseignant_id: this.noteForm.value.enseignant_id,
-        note: parseFloat(this.noteForm.value.note),
-        periode: this.noteForm.value.periode,
-        appreciation: this.noteForm.value.appreciation?.trim() || null,
-        date_evaluation: this.noteForm.value.date_evaluation
+        note: this.noteForm.value.note,
+        appreciation: this.noteForm.value.appreciation,
+        periode: this.noteForm.value.periode
       };
 
       if (this.isEditMode && this.noteId) {
-        // Mode édition
         this.noteService.updateNote(this.noteId, noteData).subscribe({
-          next: (response) => {
-            this.loading = false;
-            this.notificationService.crudSuccess('update', 'la note');
-            setTimeout(() => {
-              this.router.navigate(['/notes']);
-            }, 2000);
+          next: (response: any) => {
+            this.notificationService.success('Note mise à jour avec succès');
+            this.router.navigate(['/notes']);
           },
-          error: (error) => {
-            this.loading = false;
-            this.handleError(error);
+          error: (error: any) => {
+            this.error = 'Erreur lors de la mise à jour de la note';
+            this.notificationService.crudError('update', 'la note', error);
           }
         });
       } else {
-        // Mode création
         this.noteService.createNote(noteData).subscribe({
-          next: (response) => {
-            this.loading = false;
-            this.notificationService.crudSuccess('create', 'la note');
-            this.resetForm();
-            setTimeout(() => {
-              this.router.navigate(['/notes']);
-            }, 2000);
+          next: (response: any) => {
+            this.notificationService.success('Note créée avec succès');
+            this.router.navigate(['/notes']);
           },
-          error: (error) => {
-            this.loading = false;
-            this.handleError(error);
+          error: (error: any) => {
+            this.error = 'Erreur lors de la création de la note';
+            this.notificationService.crudError('create', 'la note', error);
           }
         });
       }

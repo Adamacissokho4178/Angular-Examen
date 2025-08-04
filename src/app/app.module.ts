@@ -4,13 +4,10 @@ import { BrowserModule, provideClientHydration } from '@angular/platform-browser
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EntrepriseComponent } from './entreprise/entreprise/entreprise.component';
-import { ProduitComponent } from './component/produit/produit.component';
-import { CategorieComponent } from './component/categorie/categorie.component';
 import { AccueilComponent } from './component/accueil/accueil.component';
-import { provideHttpClient, withFetch } from '@angular/common/http';
-import { AjoutCategorieComponent } from './component/categorie/ajout-categorie/ajout-categorie.component';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { ProduitFormComponent } from './component/produit/produit-form/produit-form.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { RegisterComponent } from './component/register/register.component';
 import { LoginComponent } from './component/login/login.component';
 import { AproposComponent } from './component/apropos/apropos.component';
@@ -18,7 +15,6 @@ import { ContactComponent } from './component/contact/contact.component';
 import { DashboardAdminComponent } from './component/dashboard-admin/dashboard-admin.component';
 
 import { DashboardEleveParentComponent } from './component/dashboard-eleve-parent/dashboard-eleve-parent.component';
-import { AjoutEleveComponent } from './component/ajout-eleve/ajout-eleve.component';
 
 // Imports des nouveaux composants CRUD
 import { EnseignantListComponent } from './component/enseignant/enseignant-list.component';
@@ -33,16 +29,22 @@ import { NotificationComponent } from './component/notification/notification.com
 
 // Composant Dashboard
 import { DashboardComponent } from './component/dashboard/dashboard.component';
+import { ClasseListComponent } from './component/classe/classe-list/classe-list.component';
+import { ClasseFormComponent } from './component/classe/classe-form/classe-form.component';
+import { AffectationComponent } from './component/affectation/affectation.component';
+
+// Composants Suivi des Notes
+import { SuiviNotesComponent } from './component/suivi-notes/suivi-notes.component';
+import { SuiviNotesDetailsComponent } from './component/suivi-notes-details/suivi-notes-details.component';
+
+// Composant Dashboard Enseignant
+import { DashboardEnseignantComponent } from './component/dashboard-enseignant/dashboard-enseignant.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     EntrepriseComponent,
-    ProduitComponent,
-    CategorieComponent,
     AccueilComponent,
-    AjoutCategorieComponent,
-    ProduitFormComponent,
     RegisterComponent,
     LoginComponent,
     AproposComponent,
@@ -50,7 +52,6 @@ import { DashboardComponent } from './component/dashboard/dashboard.component';
     DashboardAdminComponent,
 
     DashboardEleveParentComponent,
-    AjoutEleveComponent,
     // Nouveaux composants CRUD
     EnseignantListComponent,
     EnseignantFormComponent,
@@ -61,7 +62,15 @@ import { DashboardComponent } from './component/dashboard/dashboard.component';
     // Composant de notification
     NotificationComponent,
     // Composant Dashboard
-    DashboardComponent
+    DashboardComponent,
+    ClasseListComponent,
+    ClasseFormComponent,
+    AffectationComponent,
+    // Composants Suivi des Notes
+    SuiviNotesComponent,
+    SuiviNotesDetailsComponent,
+    // Composant Dashboard Enseignant
+    DashboardEnseignantComponent
   ],
   imports: [
     BrowserModule,
@@ -71,7 +80,7 @@ import { DashboardComponent } from './component/dashboard/dashboard.component';
   ],
   providers: [
     provideClientHydration(),
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
   ],
   bootstrap: [AppComponent]
 })

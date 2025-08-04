@@ -44,7 +44,7 @@ export class LoginComponent {
               if (role === 'admin') {
                 this.router.navigate(['/dashboard-admin']);
               } else if (role === 'enseignant') {
-                this.router.navigate(['/dashboard']);
+                this.router.navigate(['/dashboard-enseignant']);
               } else if (role === 'eleve' || role === 'parent') {
                 this.router.navigate(['/dashboard-eleve-parent']);
               }

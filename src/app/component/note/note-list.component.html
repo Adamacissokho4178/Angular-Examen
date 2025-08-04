@@ -164,14 +164,16 @@
                       <div>
                         <strong>{{ getEleveFullName(note) }}</strong>
                         <br>
-                        <small class="text-muted">ID: {{ note.eleve?.id || 'N/A' }}</small>
+                        <small class="text-muted">ID: {{ note.eleve && note.eleve.id ? note.eleve.id : 'N/A' }}</small>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <span class="badge bg-info">{{ note.matiere?.nom || 'N/A' }}</span>
-                    <br>
-                    <small class="text-muted">Coeff: {{ note.matiere?.coefficient || 'N/A' }}</small>
+                    <div>
+                      <span class="badge bg-info">{{ note.matiere && note.matiere.nom ? note.matiere.nom : 'N/A' }}</span>
+                      <br>
+                      <small class="text-muted">Coeff: {{ note.matiere && note.matiere.coefficient ? note.matiere.coefficient : 'N/A' }}</small>
+                    </div>
                   </td>
                   <td>
                     <div class="d-flex align-items-center">

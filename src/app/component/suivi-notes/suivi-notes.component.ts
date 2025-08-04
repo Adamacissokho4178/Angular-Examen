@@ -8,19 +8,12 @@ import { AffectationService } from '../../services/affectation.service';
 import { NoteService } from '../../services/note.service';
 
 @Component({
-  selector: 'app-dashboard-admin',
-  templateUrl: './dashboard-admin.component.html',
-  styleUrl: './dashboard-admin.component.css'
+  selector: 'app-suivi-notes',
+  templateUrl: './suivi-notes.component.html',
+  styleUrls: ['./suivi-notes.component.css']
 })
-export class DashboardAdminComponent implements OnInit {
+export class SuiviNotesComponent implements OnInit {
   
-  stats: any = {
-    notes: 0,
-    matieres: 0,
-    classes: 0,
-    affectations: 0
-  };
-
   // Données pour le tableau de suivi des notes
   suiviNotes: any[] = [];
   loading = false;
@@ -48,56 +41,49 @@ export class DashboardAdminComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadStats();
     this.loadSuiviNotes();
     this.loadFiltres();
   }
 
-  loadStats() {
-    this.loading = true;
-    
-    // Utiliser la nouvelle route API pour récupérer les vraies données
-    this.noteService.getDashboardStats().subscribe({
-      next: (stats) => {
-        this.stats = stats;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des statistiques:', error);
-        // Données de test si l'API n'est pas disponible
-        this.stats = {
-          notes: 0,
-          matieres: 0,
-          classes: 0,
-          affectations: 0,
-          suiviNotes: 0
-        };
-        this.loading = false;
-      }
-    });
-  }
-
   loadFiltres() {
-    // Charger les données pour les filtres depuis la nouvelle route API
-    this.noteService.getDropdownData().subscribe({
-      next: (data) => {
-        this.classes = data.classes || [];
-        this.matieres = data.matieres || [];
-        this.enseignants = data.enseignants || [];
+    // Charger les données pour les filtres
+    this.classeService.getClasses().subscribe({
+      next: (classes) => {
+        this.classes = classes;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des filtres:', error);
-        // Données de test en cas d'erreur
+        console.error('Erreur lors du chargement des classes:', error);
+        // Données de test
         this.classes = [
           { id: 1, nom: '6ème A' },
           { id: 2, nom: '5ème B' },
           { id: 3, nom: '4ème C' }
         ];
+      }
+    });
+
+    this.matiereService.getMatieres().subscribe({
+      next: (matieres) => {
+        this.matieres = matieres;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des matières:', error);
+        // Données de test
         this.matieres = [
           { id: 1, nom: 'Mathématiques' },
           { id: 2, nom: 'Français' },
           { id: 3, nom: 'Histoire' }
         ];
+      }
+    });
+
+    this.enseignantService.getEnseignants().subscribe({
+      next: (enseignants) => {
+        this.enseignants = enseignants;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des enseignants:', error);
+        // Données de test
         this.enseignants = [
           { id: 1, nom: 'Ndiaye', prenom: 'Moussa' },
           { id: 2, nom: 'Ba', prenom: 'Fatou' },
@@ -156,31 +142,26 @@ export class DashboardAdminComponent implements OnInit {
     }
   }
 
-  // Navigation vers les listes
-  navigateToNotes() {
-    console.log('Navigation vers suivi-notes...');
-    this.router.navigate(['/suivi-notes']);
-  }
-
-  navigateToMatieres() {
-    this.router.navigate(['/matieres']);
-  }
-
-  navigateToClasses() {
-    this.router.navigate(['/classes']);
-  }
-
-  navigateToAffectations() {
-    this.router.navigate(['/affectations']);
-  }
-
-  navigateToNotesList() {
-    this.router.navigate(['/notes']);
-  }
-
   // Filtrage du tableau
   filterSuiviNotes() {
     this.loadSuiviNotes();
+  }
+
+  // Navigation vers les détails d'une ligne
+  voirDetails(item: any) {
+    this.router.navigate(['/suivi-notes/details'], {
+      queryParams: {
+        classe: item.classe,
+        matiere: item.matiere,
+        periode: item.periode,
+        enseignant: item.enseignant
+      }
+    });
+  }
+
+  // Retour au dashboard
+  retourDashboard() {
+    this.router.navigate(['/dashboard-admin']);
   }
 
   // Méthodes pour vérifier les permissions

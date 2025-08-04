@@ -1,0 +1,159 @@
+<div class="affectation-container">
+  <!-- Section Liste -->
+  <div class="list-section" *ngIf="!showAddForm">
+    <!-- En-tête de la liste -->
+    <div class="list-header">
+      <h2>Gestion des Assignations</h2>
+      <button class="btn-ajouter" (click)="addAffectation()">Ajouter</button>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+      <input 
+        type="text" 
+        placeholder="Rechercher une assignation..." 
+        [(ngModel)]="searchTerm"
+        (input)="searchAffectations()">
+      
+      <select [(ngModel)]="selectedEnseignant" (change)="searchAffectations()">
+        <option value="">Tous les enseignants</option>
+        <option *ngFor="let enseignant of enseignants" [value]="enseignant.id">
+          {{ enseignant.nom }} {{ enseignant.prenom }}
+        </option>
+      </select>
+      
+      <select [(ngModel)]="selectedMatiere" (change)="searchAffectations()">
+        <option value="">Toutes les matières</option>
+        <option *ngFor="let matiere of matieres" [value]="matiere.id">
+          {{ matiere.nom }}
+        </option>
+      </select>
+      
+      <select [(ngModel)]="selectedClasse" (change)="searchAffectations()">
+        <option value="">Toutes les classes</option>
+        <option *ngFor="let classe of classes" [value]="classe.id">
+          {{ classe.nom }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Liste des affectations -->
+    <div class="affectations-list">
+      <!-- État de chargement -->
+      <div class="loading" *ngIf="isLoading">
+        Chargement des assignations...
+      </div>
+
+      <!-- État vide -->
+      <div class="empty-state" *ngIf="!isLoading && getFilteredAffectations().length === 0">
+        <p>Aucune assignation trouvée</p>
+        <button class="btn-ajouter" (click)="addAffectation()">Ajouter la première assignation</button>
+      </div>
+
+      <!-- Cartes des affectations -->
+      <div class="affectation-card" *ngFor="let affectation of getFilteredAffectations()">
+        <div class="affectation-info">
+          <h3>
+            {{ affectation.enseignant?.nom }} {{ affectation.enseignant?.prenom }}
+          </h3>
+          <div class="affectation-details">
+            <span class="matiere">
+              {{ affectation.matiere?.nom }}
+            </span>
+            <span class="classe">
+              {{ affectation.classe?.nom }}
+            </span>
+          </div>
+          <p class="date">
+            Assigné le {{ affectation.created_at | date:'dd/MM/yyyy' }}
+          </p>
+        </div>
+        
+        <div class="affectation-actions">
+          <button class="btn-voir" (click)="viewAffectation(affectation.id!)">
+            Voir plus
+          </button>
+          <button class="btn-modifier" (click)="editAffectation(affectation.id!)">
+            Modifier
+          </button>
+          <button class="btn-supprimer" (click)="deleteAffectation(affectation.id!)">
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Formulaire -->
+  <div class="form-section" *ngIf="showAddForm">
+    <!-- En-tête du formulaire -->
+    <div class="form-header">
+      <h2>{{ isEditMode ? 'Modifier' : 'Nouvelle' }} Assignation</h2>
+      <button class="btn-retour" (click)="cancelForm()">Retour à la liste</button>
+    </div>
+
+    <!-- Formulaire -->
+    <form class="affectation-form" [formGroup]="affectationForm" (ngSubmit)="onSubmit()">
+      <!-- Enseignant -->
+      <div class="form-group">
+        <label for="enseignant_id">Enseignant *</label>
+        <select 
+          id="enseignant_id"
+          formControlName="enseignant_id"
+          [ngClass]="{'error': isFieldInvalid('enseignant_id')}">
+          <option value="">Sélectionner un enseignant</option>
+          <option *ngFor="let enseignant of enseignants" [value]="enseignant.id">
+            {{ enseignant.nom }} {{ enseignant.prenom }} - {{ enseignant.specialite }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="isFieldInvalid('enseignant_id')">
+          {{ getErrorMessage('enseignant_id') }}
+        </div>
+      </div>
+
+      <!-- Matière -->
+      <div class="form-group">
+        <label for="matiere_id">Matière *</label>
+        <select 
+          id="matiere_id"
+          formControlName="matiere_id"
+          [ngClass]="{'error': isFieldInvalid('matiere_id')}">
+          <option value="">Sélectionner une matière</option>
+          <option *ngFor="let matiere of matieres" [value]="matiere.id">
+            {{ matiere.nom }} ({{ matiere.niveau }}) - Coef: {{ matiere.coefficient }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="isFieldInvalid('matiere_id')">
+          {{ getErrorMessage('matiere_id') }}
+        </div>
+      </div>
+
+      <!-- Classe -->
+      <div class="form-group">
+        <label for="classe_id">Classe *</label>
+        <select 
+          id="classe_id"
+          formControlName="classe_id"
+          [ngClass]="{'error': isFieldInvalid('classe_id')}">
+          <option value="">Sélectionner une classe</option>
+          <option *ngFor="let classe of classes" [value]="classe.id">
+            {{ classe.nom }} ({{ classe.niveau }}) - Capacité: {{ classe.capacite }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="isFieldInvalid('classe_id')">
+          {{ getErrorMessage('classe_id') }}
+        </div>
+      </div>
+
+      <!-- Actions du formulaire -->
+      <div class="form-actions">
+        <button type="button" class="btn-annuler" (click)="cancelForm()">
+          Annuler
+        </button>
+        <button type="submit" class="btn-ajouter" [disabled]="!canSubmit()">
+          {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

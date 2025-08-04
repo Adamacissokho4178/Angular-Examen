@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NoteService, NoteWithDetails } from '../../services/note.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-note-list',
@@ -37,7 +38,8 @@ export class NoteListComponent implements OnInit {
 
   constructor(
     private noteService: NoteService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -50,15 +52,13 @@ export class NoteListComponent implements OnInit {
     this.error = '';
 
     this.noteService.getNotesWithDetails().subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.notes = data;
-        this.filteredNotes = data;
         this.loading = false;
       },
-      error: (error) => {
-        this.error = 'Erreur lors du chargement des notes';
+      error: (error: any) => {
+        console.error('Erreur lors du chargement des notes:', error);
         this.loading = false;
-        console.error('Erreur:', error);
       }
     });
   }
@@ -100,13 +100,13 @@ export class NoteListComponent implements OnInit {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
       this.noteService.deleteNote(id).subscribe({
         next: () => {
-          this.notes = this.notes.filter(n => n.id !== id);
-          this.filteredNotes = this.filteredNotes.filter(n => n.id !== id);
-          alert('Note supprimée avec succès');
+          this.notes = this.notes.filter(note => note.id !== id);
+          this.filteredNotes = this.filteredNotes.filter(note => note.id !== id);
+          this.notificationService.success('Note supprimée avec succès');
         },
-        error: (error) => {
-          this.error = 'Erreur lors de la suppression';
-          console.error('Erreur:', error);
+        error: (error: any) => {
+          console.error('Erreur lors de la suppression:', error);
+          this.notificationService.error('Erreur lors de la suppression de la note');
         }
       });
     }
@@ -202,7 +202,12 @@ export class NoteListComponent implements OnInit {
 
   // Trier les notes par date d'évaluation
   sortByDate(): void {
-    this.filteredNotes.sort((a, b) => new Date(b.date_evaluation).getTime() - new Date(a.date_evaluation).getTime());
+    // Trier par date d'évaluation (plus récent en premier)
+    this.filteredNotes.sort((a, b) => {
+      const dateA = a.date_evaluation ? new Date(a.date_evaluation).getTime() : 0;
+      const dateB = b.date_evaluation ? new Date(b.date_evaluation).getTime() : 0;
+      return dateB - dateA;
+    });
   }
 
   // Trier les notes par élève
@@ -278,7 +283,8 @@ export class NoteListComponent implements OnInit {
   }
 
   // Formater la date
-  formatDate(date: string): string {
+  formatDate(date: string | undefined): string {
+    if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('fr-FR');
   }
 } 

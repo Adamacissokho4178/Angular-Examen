@@ -1,0 +1,130 @@
+<div class="classe-list-container">
+  <!-- En-tête -->
+  <div class="header-section">
+    <div class="header-content">
+      <h1><i class="fas fa-users"></i> Gestion des Classes</h1>
+      <p>Gérez les classes de l'établissement scolaire</p>
+    </div>
+    <button class="btn btn-primary add-btn" (click)="addClasse()">
+      <i class="fas fa-plus"></i> Nouvelle Classe
+    </button>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        placeholder="Rechercher une classe..." 
+        [(ngModel)]="searchTerm"
+        class="search-input">
+    </div>
+
+    <div class="filter-controls">
+      <select [(ngModel)]="selectedNiveau" class="filter-select">
+        <option value="">Tous les niveaux</option>
+        <option *ngFor="let niveau of niveaux" [value]="niveau">{{ niveau }}</option>
+      </select>
+
+      <button class="btn btn-secondary" (click)="clearFilters()">
+        <i class="fas fa-times"></i> Effacer
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages d'erreur -->
+  <div *ngIf="error" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-section">
+    <div class="spinner"></div>
+    <p>Chargement des classes...</p>
+  </div>
+
+  <!-- Liste des classes -->
+  <div *ngIf="!loading && filterClasses().length > 0" class="classes-grid">
+    <div *ngFor="let classe of filterClasses()" class="classe-card">
+      <div class="classe-header">
+        <div class="niveau-badge" [style.background-color]="getNiveauColor(classe.niveau)">
+          {{ classe.niveau }}
+        </div>
+        <div class="classe-actions">
+          <button class="btn-icon" (click)="editClasse(classe.id!)" title="Modifier">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn-icon btn-danger" (click)="deleteClasse(classe.id!)" title="Supprimer">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="classe-content">
+        <h3 class="classe-nom">{{ classe.nom }}</h3>
+        <div class="classe-info">
+          <div class="info-item">
+            <i class="fas fa-user-graduate"></i>
+            <span>Capacité: {{ classe.capacite }} élèves</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="classe-footer">
+        <span class="created-date" *ngIf="classe.created_at">
+          Créée le {{ classe.created_at | date:'dd/MM/yyyy' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucune classe -->
+  <div *ngIf="!loading && filterClasses().length === 0" class="empty-state">
+    <i class="fas fa-users-slash"></i>
+    <h3>Aucune classe trouvée</h3>
+    <p *ngIf="searchTerm || selectedNiveau">
+      Aucune classe ne correspond à vos critères de recherche.
+    </p>
+    <p *ngIf="!searchTerm && !selectedNiveau">
+      Aucune classe n'a encore été créée.
+    </p>
+    <button class="btn btn-primary" (click)="addClasse()">
+      <i class="fas fa-plus"></i> Créer la première classe
+    </button>
+  </div>
+
+  <!-- Statistiques -->
+  <div *ngIf="!loading && classes.length > 0" class="stats-section">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ classes.length }}</h3>
+        <p>Classes totales</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-layer-group"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ niveaux.length }}</h3>
+        <p>Niveaux disponibles</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ getTotalCapacite() }}</h3>
+        <p>Capacité totale</p>
+      </div>
+    </div>
+  </div>
+</div>

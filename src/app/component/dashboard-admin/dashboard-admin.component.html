@@ -1,4 +1,358 @@
-<div class="dashboard-container">
-  <h1>Bienvenue sur le Dashboard Administrateur</h1>
-  <p>Vous pouvez gérer les utilisateurs, les classes, les matières, les enseignants et les notes.</p>
+<div class="dashboard-admin-container">
+  <!-- En-tête du dashboard -->
+  <div class="dashboard-header">
+    <h1><i class="fas fa-user-shield"></i> Dashboard Administrateur</h1>
+    <p class="welcome-text">Bienvenue dans votre espace de gestion administrative</p>
+  </div>
+
+  <!-- Statistiques rapides -->
+  <div class="stats-section">
+    <div class="stat-card" (click)="navigateToNotes()" style="cursor: pointer;">
+      <div class="stat-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ stats?.suiviNotes || 0 }}</h3>
+        <p>Suivi des Notes Détaillé</p>
+      </div>
+    </div>
+
+    <!-- Bouton de test pour la navigation -->
+    <button class="btn btn-primary" (click)="navigateToNotes()" style="margin: 10px;">
+      Test Navigation Suivi Notes
+    </button>
+
+    <div class="stat-card" (click)="navigateToMatieres()" style="cursor: pointer;">
+      <div class="stat-icon">
+        <i class="fas fa-book"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ stats?.matieres || 0 }}</h3>
+        <p>Niveaux</p>
+      </div>
+    </div>
+
+    <div class="stat-card" (click)="navigateToClasses()" style="cursor: pointer;">
+      <div class="stat-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ stats?.classes || 0 }}</h3>
+        <p>Classes</p>
+      </div>
+    </div>
+
+    <div class="stat-card" (click)="navigateToAffectations()" style="cursor: pointer;">
+      <div class="stat-icon">
+        <i class="fas fa-link"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ stats?.affectations || 0 }}</h3>
+        <p>Assignations</p>
+      </div>
+    </div>
+
+    <div class="stat-card" (click)="navigateToNotesList()" style="cursor: pointer;">
+      <div class="stat-icon">
+        <i class="fas fa-star"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ stats?.notes || 0 }}</h3>
+        <p>Notes</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suivi des Notes Détaillé -->
+  <div class="suivi-notes-section">
+    <h2><i class="fas fa-chart-line"></i> Suivi des Notes Détaillé</h2>
+    
+    <!-- Filtres intelligents -->
+    <div class="filtres-section">
+      <div class="filtres-grid">
+        <div class="filtre-item">
+          <label for="periode">Trimestre</label>
+          <select id="periode" [(ngModel)]="selectedPeriode" (change)="filterSuiviNotes()">
+            <option *ngFor="let periode of periodes" [value]="periode">{{ periode }}</option>
+          </select>
+        </div>
+
+        <div class="filtre-item">
+          <label for="classe">Classe</label>
+          <select id="classe" [(ngModel)]="selectedClasse" (change)="filterSuiviNotes()">
+            <option value="">Toutes les classes</option>
+            <option *ngFor="let classe of classes" [value]="classe.nom">{{ classe.nom }}</option>
+          </select>
+        </div>
+
+        <div class="filtre-item">
+          <label for="matiere">Matière</label>
+          <select id="matiere" [(ngModel)]="selectedMatiere" (change)="filterSuiviNotes()">
+            <option value="">Toutes les matières</option>
+            <option *ngFor="let matiere of matieres" [value]="matiere.nom">{{ matiere.nom }}</option>
+          </select>
+        </div>
+
+        <div class="filtre-item">
+          <label for="enseignant">Enseignant</label>
+          <select id="enseignant" [(ngModel)]="selectedEnseignant" (change)="filterSuiviNotes()">
+            <option value="">Tous les enseignants</option>
+            <option *ngFor="let enseignant of enseignants" [value]="enseignant.nom + ' ' + enseignant.prenom">
+              {{ enseignant.nom }} {{ enseignant.prenom }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tableau détaillé -->
+    <div class="tableau-section">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Classe</th>
+              <th>Matière</th>
+              <th>Enseignant</th>
+              <th>Trimestre</th>
+              <th>Élèves attendus</th>
+              <th>Notes saisies</th>
+              <th>% Avancement</th>
+              <th>Dernière saisie</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of suiviNotes">
+              <td>{{ item.classe }}</td>
+              <td>{{ item.matiere }}</td>
+              <td>{{ item.enseignant }}</td>
+              <td>{{ item.periode }}</td>
+              <td>{{ item.elevesAttendus }}</td>
+              <td>{{ item.notesSaisies }}</td>
+              <td>
+                <div class="progress" style="width: 100px;">
+                  <div class="progress-bar" [style.width.%]="item.pourcentage">
+                    {{ item.pourcentage }}%
+                  </div>
+                </div>
+              </td>
+              <td>{{ item.derniereSaisie }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-success': item.pourcentage === 100,
+                  'bg-warning': item.pourcentage > 0 && item.pourcentage < 100,
+                  'bg-danger': item.pourcentage === 0
+                }">
+                  {{ item.statut }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-primary" (click)="navigateToNotes()">
+                  <i class="fas fa-eye"></i> Voir
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- États de chargement et d'erreur -->
+      <div *ngIf="loading" class="text-center p-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Chargement...</span>
+        </div>
+        <p class="mt-2">Chargement des données...</p>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <div *ngIf="!loading && !error && suiviNotes.length === 0" class="text-center p-4">
+        <p class="text-muted">Aucune donnée de suivi disponible</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fonctionnalités principales -->
+  <div class="features-section">
+    <h2><i class="fas fa-cogs"></i> Fonctionnalités Administratives</h2>
+    
+    <div class="features-grid">
+      <!-- Gestion des Enseignants -->
+      <div class="feature-card">
+        <div class="feature-header">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <h3>Gestion des Enseignants</h3>
+        </div>
+        <div class="feature-content">
+          <p>Gestion complète du personnel enseignant</p>
+          <ul>
+            <li>Ajouter de nouveaux enseignants</li>
+            <li>Modifier les informations</li>
+            <li>Affecter aux matières</li>
+            <li>Gérer les permissions</li>
+          </ul>
+        </div>
+        <div class="feature-actions">
+          <button class="btn btn-primary" [routerLink]="['/enseignants']">
+            <i class="fas fa-list"></i> Liste
+          </button>
+          <button class="btn btn-success" [routerLink]="['/enseignants/ajout']">
+            <i class="fas fa-plus"></i> Ajouter
+          </button>
+        </div>
+      </div>
+
+      <!-- Gestion des Matières -->
+      <div class="feature-card">
+        <div class="feature-header">
+          <i class="fas fa-book"></i>
+          <h3>Gestion des Matières</h3>
+        </div>
+        <div class="feature-content">
+          <p>Configuration des matières et coefficients</p>
+          <ul>
+            <li>Créer de nouvelles matières</li>
+            <li>Définir les coefficients</li>
+            <li>Assigner aux niveaux</li>
+            <li>Gérer les programmes</li>
+          </ul>
+        </div>
+        <div class="feature-actions">
+          <button class="btn btn-primary" [routerLink]="['/matieres']">
+            <i class="fas fa-list"></i> Liste
+          </button>
+          <button class="btn btn-success" [routerLink]="['/matieres/ajout']">
+            <i class="fas fa-plus"></i> Ajouter
+          </button>
+        </div>
+      </div>
+
+      <!-- Génération des Bulletins -->
+      <div class="feature-card">
+        <div class="feature-header">
+          <i class="fas fa-file-pdf"></i>
+          <h3>Génération des Bulletins</h3>
+        </div>
+        <div class="feature-content">
+          <p>Génération et gestion des bulletins scolaires</p>
+          <ul>
+            <li>Générer tous les bulletins</li>
+            <li>Bulletins par classe</li>
+            <li>Bulletins individuels</li>
+            <li>Export PDF</li>
+          </ul>
+        </div>
+        <div class="feature-actions">
+          <button class="btn btn-warning" [routerLink]="['/bulletins/generer']">
+            <i class="fas fa-download"></i> Générer
+          </button>
+          <button class="btn btn-info">
+            <i class="fas fa-eye"></i> Consulter
+          </button>
+        </div>
+      </div>
+
+      <!-- Dashboard Administrateur -->
+      <div class="feature-card">
+        <div class="feature-header">
+          <i class="fas fa-chart-bar"></i>
+          <h3>Dashboard Administrateur</h3>
+        </div>
+        <div class="feature-content">
+          <p>Tableau de bord avec statistiques</p>
+          <ul>
+            <li>Statistiques globales</li>
+            <li>Graphiques de performance</li>
+            <li>Rapports détaillés</li>
+            <li>Suivi des activités</li>
+          </ul>
+        </div>
+        <div class="feature-actions">
+          <button class="btn btn-primary" [routerLink]="['/dashboard']">
+            <i class="fas fa-chart-line"></i> Voir
+          </button>
+          <button class="btn btn-secondary">
+            <i class="fas fa-download"></i> Exporter
+          </button>
+        </div>
+      </div>
+
+      <!-- Gestion des Assignations -->
+      <div class="feature-card">
+        <div class="feature-header">
+          <i class="fas fa-link"></i>
+          <h3>Gestion des Assignations</h3>
+        </div>
+        <div class="feature-content">
+          <p>Assignation des enseignants aux matières et classes</p>
+          <ul>
+            <li>Assigner enseignants aux matières</li>
+            <li>Assigner aux classes</li>
+            <li>Gérer les emplois du temps</li>
+            <li>Suivi des responsabilités</li>
+          </ul>
+        </div>
+        <div class="feature-actions">
+          <button class="btn btn-primary" [routerLink]="['/affectations']">
+            <i class="fas fa-list"></i> Gérer
+          </button>
+          <button class="btn btn-success" [routerLink]="['/affectations']">
+            <i class="fas fa-plus"></i> Assigner
+          </button>
+        </div>
+      </div>
+
+      <!-- Gestion des Classes -->
+      <div class="feature-card">
+        <div class="feature-header">
+          <i class="fas fa-users"></i>
+          <h3>Gestion des Classes</h3>
+        </div>
+        <div class="feature-content">
+          <p>Organisation des classes et niveaux</p>
+          <ul>
+            <li>Créer des classes</li>
+            <li>Affecter les élèves</li>
+            <li>Gérer les emplois du temps</li>
+            <li>Suivi des effectifs</li>
+          </ul>
+        </div>
+        <div class="feature-actions">
+          <button class="btn btn-primary" [routerLink]="['/classes']">
+            <i class="fas fa-list"></i> Classes
+          </button>
+          <button class="btn btn-success" [routerLink]="['/classes/ajout']">
+            <i class="fas fa-plus"></i> Nouvelle
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="quick-actions">
+    <h2><i class="fas fa-bolt"></i> Actions Rapides</h2>
+    <div class="actions-grid">
+      <button class="action-btn" [routerLink]="['/enseignants/ajout']">
+        <i class="fas fa-user-plus"></i>
+        <span>Nouvel Enseignant</span>
+      </button>
+      <button class="action-btn" [routerLink]="['/matieres/ajout']">
+        <i class="fas fa-plus-circle"></i>
+        <span>Nouvelle Matière</span>
+      </button>
+      <button class="action-btn" [routerLink]="['/classes/ajout']">
+        <i class="fas fa-users"></i>
+        <span>Nouvelle Classe</span>
+      </button>
+      <button class="action-btn" [routerLink]="['/affectations']">
+        <i class="fas fa-link"></i>
+        <span>Gérer Assignations</span>
+      </button>
+    </div>
+  </div>
 </div>

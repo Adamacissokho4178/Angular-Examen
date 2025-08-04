@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AjoutEleveComponent } from './ajout-eleve.component';
+import { SuiviNotesComponent } from './suivi-notes.component';
 
-describe('AjoutEleveComponent', () => {
-  let component: AjoutEleveComponent;
-  let fixture: ComponentFixture<AjoutEleveComponent>;
+describe('SuiviNotesComponent', () => {
+  let component: SuiviNotesComponent;
+  let fixture: ComponentFixture<SuiviNotesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AjoutEleveComponent]
+      declarations: [SuiviNotesComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AjoutEleveComponent);
+    fixture = TestBed.createComponent(SuiviNotesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

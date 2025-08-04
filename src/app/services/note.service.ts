@@ -1,141 +1,233 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from '../environment';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 export interface Note {
-  id?: number;
+  id: number;
   eleve_id: number;
   matiere_id: number;
-  enseignant_id: number;
+  classe_id: number;
+  enseignant_id?: number;
   note: number;
-  periode: string;
   appreciation?: string;
-  date_evaluation: string;
-  created_at?: string;
-  updated_at?: string;
+  periode: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface NoteWithDetails extends Note {
-  eleve?: {
+  eleve: {
     id: number;
     nom: string;
     prenom: string;
+    matricule: string;
   };
-  matiere?: {
+  matiere: {
     id: number;
     nom: string;
-    coefficient: number;
+    coefficient?: number;
+  };
+  classe: {
+    id: number;
+    nom: string;
   };
   enseignant?: {
     id: number;
     nom: string;
     prenom: string;
   };
+  date_evaluation?: string;
 }
 
-export interface MoyenneEleve {
-  eleve_id: number;
-  eleve_nom: string;
-  eleve_prenom: string;
-  moyenne: number;
-  mention: string;
-  rang?: number;
+export interface SuiviNotes {
+  classe: string;
+  matiere: string;
+  enseignant: string;
+  trimestre: string;
+  eleves_attendus: number;
+  notes_saisies: number;
+  pourcentage_avancement: number;
+  derniere_saisie: string;
+  statut: 'Terminé' | 'Incomplet' | 'Non commencé';
 }
 
 export interface StatistiquesNotes {
   total_notes: number;
   moyenne_generale: number;
-  notes_par_periode: any[];
-  notes_par_matiere: any[];
+  notes_excellentes: number;
+  notes_bonnes: number;
+  notes_moyennes: number;
+  notes_passables: number;
+  notes_insuffisantes: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class NoteService {
-  private apiUrl = `${environment.apiUrl}/notes`;
+  private apiUrl = 'http://localhost:8000/api';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
+
+  // Récupérer le suivi des notes détaillé
+  getSuiviNotes(filtres?: {
+    trimestre?: string;
+    classe?: string;
+    matiere?: string;
+    enseignant?: string;
+  }): Observable<SuiviNotes[]> {
+    let url = `${this.apiUrl}/suivi-notes`;
+    
+    if (filtres) {
+      const params = new URLSearchParams();
+      if (filtres.trimestre) params.append('trimestre', filtres.trimestre);
+      if (filtres.classe) params.append('classe', filtres.classe);
+      if (filtres.matiere) params.append('matiere', filtres.matiere);
+      if (filtres.enseignant) params.append('enseignant', filtres.enseignant);
+      
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+    }
+
+    return this.http.get<SuiviNotes[]>(url).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération du suivi des notes:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Récupérer les détails des notes pour une classe/matière/période spécifique
+  getNotesDetails(classe: string, matiere: string, periode: string, enseignant: string): Observable<NoteWithDetails[]> {
+    const url = `${this.apiUrl}/notes-details?classe=${classe}&matiere=${matiere}&periode=${periode}&enseignant=${enseignant}`;
+    
+    return this.http.get<NoteWithDetails[]>(url).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération des détails des notes:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Récupérer les statistiques des notes pour le dashboard
+  getStatistiquesNotes(): Observable<StatistiquesNotes> {
+    return this.http.get<StatistiquesNotes>(`${this.apiUrl}/statistiques-notes`).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération des statistiques:', error);
+        return of({
+          total_notes: 0,
+          moyenne_generale: 0,
+          notes_excellentes: 0,
+          notes_bonnes: 0,
+          notes_moyennes: 0,
+          notes_passables: 0,
+          notes_insuffisantes: 0
+        });
+      })
+    );
+  }
 
   // Récupérer toutes les notes
   getNotes(): Observable<Note[]> {
-    return this.http.get<Note[]>(this.apiUrl);
+    return this.http.get<Note[]>(`${this.apiUrl}/notes`).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération des notes:', error);
+        return of([]);
+      })
+    );
   }
 
   // Récupérer une note par ID
   getNote(id: number): Observable<Note> {
-    return this.http.get<Note>(`${this.apiUrl}/${id}`);
+    return this.http.get<Note>(`${this.apiUrl}/notes/${id}`).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération de la note:', error);
+        return of({} as Note);
+      })
+    );
   }
 
   // Créer une nouvelle note
-  createNote(note: Note): Observable<Note> {
-    return this.http.post<Note>(this.apiUrl, note);
+  createNote(noteData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/notes`, noteData).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la création de la note:', error);
+        return of(null);
+      })
+    );
   }
 
   // Mettre à jour une note
-  updateNote(id: number, note: Note): Observable<Note> {
-    return this.http.put<Note>(`${this.apiUrl}/${id}`, note);
+  updateNote(id: number, noteData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/notes/${id}`, noteData).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la mise à jour de la note:', error);
+        return of(null);
+      })
+    );
   }
 
   // Supprimer une note
   deleteNote(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/notes/${id}`).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la suppression de la note:', error);
+        return of(null);
+      })
+    );
   }
 
-  // Récupérer les notes d'un élève
-  getNotesByEleve(eleveId: number): Observable<NoteWithDetails[]> {
-    return this.http.get<NoteWithDetails[]>(`${this.apiUrl}/eleve/${eleveId}`);
-  }
-
-  // Récupérer les notes d'une matière
-  getNotesByMatiere(matiereId: number): Observable<NoteWithDetails[]> {
-    return this.http.get<NoteWithDetails[]>(`${this.apiUrl}/matiere/${matiereId}`);
-  }
-
-  // Récupérer les notes par période
-  getNotesByPeriode(periode: string): Observable<NoteWithDetails[]> {
-    return this.http.get<NoteWithDetails[]>(`${this.apiUrl}/periode/${periode}`);
-  }
-
-  // Calculer la moyenne d'un élève
-  calculerMoyenne(eleveId: number): Observable<MoyenneEleve> {
-    return this.http.get<MoyenneEleve>(`${this.apiUrl}/moyenne/${eleveId}`);
-  }
-
-  // Calculer la moyenne d'un élève par période
-  calculerMoyennePeriode(eleveId: number, periode: string): Observable<MoyenneEleve> {
-    return this.http.get<MoyenneEleve>(`${this.apiUrl}/moyenne/${eleveId}/${periode}`);
-  }
-
-  // Récupérer les statistiques des notes
-  getStatistiques(): Observable<StatistiquesNotes> {
-    return this.http.get<StatistiquesNotes>(`${this.apiUrl}/statistiques`);
-  }
-
-  // Récupérer les notes avec tous les détails
+  // Récupérer les notes avec détails
   getNotesWithDetails(): Observable<NoteWithDetails[]> {
-    return this.http.get<NoteWithDetails[]>(`${this.apiUrl}?with=eleve,matiere,enseignant`);
+    return this.http.get<NoteWithDetails[]>(`${this.apiUrl}/notes-with-details`).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération des notes avec détails:', error);
+        return of([]);
+      })
+    );
   }
 
-  // Valider une note (entre 0 et 20)
-  validateNote(note: number): boolean {
-    return note >= 0 && note <= 20;
+  // Récupérer les statistiques du dashboard
+  getDashboardStats(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/dashboard-stats`).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération des statistiques du dashboard:', error);
+        return of({
+          notes: 0,
+          matieres: 0,
+          classes: 0,
+          affectations: 0,
+          suiviNotes: 0
+        });
+      })
+    );
   }
 
-  // Calculer la mention automatiquement
-  calculerMention(moyenne: number): string {
-    if (moyenne >= 16) return 'Très Bien';
-    if (moyenne >= 14) return 'Bien';
-    if (moyenne >= 12) return 'Assez Bien';
-    if (moyenne >= 10) return 'Passable';
-    return 'Insuffisant';
+  // Obtenir l'URL de l'API
+  getApiUrl(): string {
+    return this.apiUrl;
   }
 
-  // Générer un bulletin PDF
-  genererBulletin(eleveId: number, periode: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/bulletin/${eleveId}/${periode}`, {
-      responseType: 'blob'
-    });
+  // Récupérer les données des listes déroulantes
+  getDropdownData(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/dropdown-data`).pipe(
+      catchError(error => {
+        console.error('Erreur lors de la récupération des données des listes déroulantes:', error);
+        return of({
+          enseignants: [],
+          matieres: [],
+          classes: []
+        });
+      })
+    );
+  }
+
+  // Récupérer le nombre total de suivi des notes
+  getNombreSuiviNotes(): Observable<number> {
+    return this.getSuiviNotes().pipe(
+      map(suivi => suivi.length)
+    );
   }
 } 

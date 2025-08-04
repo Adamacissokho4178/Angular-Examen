@@ -1,0 +1,77 @@
+<div class="classe-form-container">
+  <div class="form-section">
+    <!-- En-tête du formulaire -->
+    <div class="form-header">
+      <h2>{{ isEditMode ? 'Modifier' : 'Nouvelle' }} Classe</h2>
+      <button class="btn-retour" (click)="cancel()">Retour à la liste</button>
+    </div>
+
+    <!-- Formulaire -->
+    <form class="classe-form" [formGroup]="classeForm" (ngSubmit)="onSubmit()">
+      <!-- Nom de la classe -->
+      <div class="form-group">
+        <label for="nom">Nom de la classe *</label>
+        <input 
+          type="text" 
+          id="nom"
+          formControlName="nom"
+          placeholder="Ex: 6ème A, 5ème B"
+          [ngClass]="{'error': isFieldInvalid('nom')}">
+        <div class="error-message" *ngIf="isFieldInvalid('nom')">
+          {{ getErrorMessage('nom') }}
+        </div>
+      </div>
+
+      <!-- Niveau -->
+      <div class="form-group">
+        <label for="niveau">Niveau *</label>
+        <select 
+          id="niveau"
+          formControlName="niveau"
+          [ngClass]="{'error': isFieldInvalid('niveau')}">
+          <option value="">Sélectionner un niveau</option>
+          <option *ngFor="let niveau of niveaux" [value]="niveau">
+            {{ niveau }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="isFieldInvalid('niveau')">
+          {{ getErrorMessage('niveau') }}
+        </div>
+      </div>
+
+      <!-- Capacité -->
+      <div class="form-group">
+        <label for="capacite">Capacité (nombre d'élèves max) *</label>
+        <input 
+          type="number" 
+          id="capacite"
+          formControlName="capacite"
+          placeholder="30"
+          min="1"
+          max="50"
+          [ngClass]="{'error': isFieldInvalid('capacite')}">
+        <div class="error-message" *ngIf="isFieldInvalid('capacite')">
+          {{ getErrorMessage('capacite') }}
+        </div>
+      </div>
+
+      <!-- Messages d'erreur et de succès -->
+      <div class="alert alert-danger" *ngIf="error">
+        {{ error }}
+      </div>
+      <div class="alert alert-success" *ngIf="success">
+        {{ success }}
+      </div>
+
+      <!-- Actions du formulaire -->
+      <div class="form-actions">
+        <button type="button" class="btn-annuler" (click)="cancel()">
+          Annuler
+        </button>
+        <button type="submit" class="btn-ajouter" [disabled]="!classeForm.valid || loading">
+          {{ loading ? 'Chargement...' : (isEditMode ? 'Modifier' : 'Ajouter') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

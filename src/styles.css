@@ -2,15 +2,15 @@
 
 /* Variables CSS pour les couleurs */
 :root {
-  --primary-color: #007bff;
-  --primary-dark: #0056b3;
-  --secondary-color: #6c757d;
-  --success-color: #28a745;
-  --danger-color: #dc3545;
+  --primary-color: #48b4bb;
+  --primary-dark: #3a9ba3;
+  --secondary-color: #06697b;
+  --success-color: #36cbad;
+  --danger-color: #ff6b6b;
   --warning-color: #ffc107;
-  --info-color: #17a2b8;
-  --light-color: #f8f9fa;
-  --dark-color: #343a40;
+  --info-color: #4ee1be;
+  --light-color: #d9e7e8;
+  --dark-color: #333333;
   --white: #ffffff;
   --gray-100: #f8f9fa;
   --gray-200: #e9ecef;
@@ -638,94 +638,6 @@ body {
 
 /* ===== CUSTOM COMPONENTS ===== */
 
-/* Navigation */
-.navbar {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background-color: var(--white);
-  box-shadow: var(--box-shadow);
-}
-
-.navbar-brand {
-  display: inline-block;
-  padding-top: 0.3125rem;
-  padding-bottom: 0.3125rem;
-  margin-right: 1rem;
-  font-size: 1.25rem;
-  line-height: inherit;
-  white-space: nowrap;
-  text-decoration: none;
-  color: var(--gray-900);
-}
-
-.navbar-nav {
-  display: flex;
-  flex-direction: row;
-  padding-left: 0;
-  margin-bottom: 0;
-  list-style: none;
-}
-
-.nav-link {
-  display: block;
-  padding: 0.5rem 1rem;
-  color: var(--gray-700);
-  text-decoration: none;
-  transition: var(--transition);
-}
-
-.nav-link:hover {
-  color: var(--primary-color);
-}
-
-/* Dropdown */
-.dropdown {
-  position: relative;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 1000;
-  display: none;
-  min-width: 10rem;
-  padding: 0.5rem 0;
-  margin: 0.125rem 0 0;
-  font-size: 1rem;
-  color: var(--gray-700);
-  text-align: left;
-  list-style: none;
-  background-color: var(--white);
-  background-clip: padding-box;
-  border: 1px solid var(--gray-300);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow-lg);
-}
-
-.dropdown-item {
-  display: block;
-  width: 100%;
-  padding: 0.25rem 1rem;
-  clear: both;
-  font-weight: 400;
-  color: var(--gray-700);
-  text-align: inherit;
-  text-decoration: none;
-  white-space: nowrap;
-  background-color: transparent;
-  border: 0;
-}
-
-.dropdown-item:hover {
-  color: var(--gray-900);
-  background-color: var(--gray-100);
-}
-
 /* Input groups */
 .input-group {
   position: relative;
@@ -817,7 +729,7 @@ body {
 
 /* ===== PRINT STYLES ===== */
 @media print {
-  .btn, .navbar, .card-header, .card-footer {
+  .btn, .card-header, .card-footer {
     display: none !important;
   }
   

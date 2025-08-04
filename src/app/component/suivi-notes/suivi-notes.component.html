@@ -1,0 +1,119 @@
+<div class="suivi-notes-container">
+  <!-- En-tête -->
+  <div class="suivi-notes-header">
+    <div class="header-content">
+      <h1><i class="fas fa-chart-line"></i> Suivi des Notes Détaillé</h1>
+      <button class="btn btn-secondary" (click)="retourDashboard()">
+        <i class="fas fa-arrow-left"></i> Retour au Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtres intelligents -->
+  <div class="filtres-section">
+    <div class="filtres-grid">
+      <div class="filtre-item">
+        <label for="periode">Trimestre</label>
+        <select id="periode" [(ngModel)]="selectedPeriode" (change)="filterSuiviNotes()">
+          <option *ngFor="let periode of periodes" [value]="periode">{{ periode }}</option>
+        </select>
+      </div>
+
+      <div class="filtre-item">
+        <label for="classe">Classe</label>
+        <select id="classe" [(ngModel)]="selectedClasse" (change)="filterSuiviNotes()">
+          <option value="">Toutes les classes</option>
+          <option *ngFor="let classe of classes" [value]="classe.nom">{{ classe.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filtre-item">
+        <label for="matiere">Matière</label>
+        <select id="matiere" [(ngModel)]="selectedMatiere" (change)="filterSuiviNotes()">
+          <option value="">Toutes les matières</option>
+          <option *ngFor="let matiere of matieres" [value]="matiere.nom">{{ matiere.nom }}</option>
+        </select>
+      </div>
+
+      <div class="filtre-item">
+        <label for="enseignant">Enseignant</label>
+        <select id="enseignant" [(ngModel)]="selectedEnseignant" (change)="filterSuiviNotes()">
+          <option value="">Tous les enseignants</option>
+          <option *ngFor="let enseignant of enseignants" [value]="enseignant.nom + ' ' + enseignant.prenom">
+            {{ enseignant.nom }} {{ enseignant.prenom }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau détaillé -->
+  <div class="tableau-section">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Classe</th>
+            <th>Matière</th>
+            <th>Enseignant</th>
+            <th>Trimestre</th>
+            <th>Élèves attendus</th>
+            <th>Notes saisies</th>
+            <th>% Avancement</th>
+            <th>Dernière saisie</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of suiviNotes">
+            <td>{{ item.classe }}</td>
+            <td>{{ item.matiere }}</td>
+            <td>{{ item.enseignant }}</td>
+            <td>{{ item.periode }}</td>
+            <td>{{ item.elevesAttendus }}</td>
+            <td>{{ item.notesSaisies }}</td>
+            <td>
+              <div class="progress" style="width: 100px;">
+                <div class="progress-bar" [style.width.%]="item.pourcentage">
+                  {{ item.pourcentage }}%
+                </div>
+              </div>
+            </td>
+            <td>{{ item.derniereSaisie }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-success': item.pourcentage === 100,
+                'bg-warning': item.pourcentage > 0 && item.pourcentage < 100,
+                'bg-danger': item.pourcentage === 0
+              }">
+                {{ item.statut }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-primary" (click)="voirDetails(item)">
+                <i class="fas fa-eye"></i> Voir détails
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- États de chargement et d'erreur -->
+    <div *ngIf="loading" class="text-center p-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Chargement...</span>
+      </div>
+      <p class="mt-2">Chargement des données...</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && suiviNotes.length === 0" class="text-center p-4">
+      <p class="text-muted">Aucune donnée de suivi disponible</p>
+    </div>
+  </div>
+</div>

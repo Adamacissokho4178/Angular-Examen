@@ -1,0 +1,94 @@
+<div class="suivi-notes-details-container">
+  <!-- En-tête -->
+  <div class="details-header">
+    <div class="header-content">
+      <h1><i class="fas fa-list-alt"></i> Détails des Notes</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="retourListe()">
+          <i class="fas fa-arrow-left"></i> Retour à la liste
+        </button>
+        <button class="btn btn-primary" (click)="retourDashboard()">
+          <i class="fas fa-home"></i> Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Informations de contexte -->
+  <div class="context-info">
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Classe:</label>
+        <span>{{ classe }}</span>
+      </div>
+      <div class="info-item">
+        <label>Matière:</label>
+        <span>{{ matiere }}</span>
+      </div>
+      <div class="info-item">
+        <label>Période:</label>
+        <span>{{ periode }}</span>
+      </div>
+      <div class="info-item">
+        <label>Enseignant:</label>
+        <span>{{ enseignant }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau des notes détaillées -->
+  <div class="notes-details-section">
+    <h2>Notes des Élèves</h2>
+    
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Élève</th>
+            <th>Matricule</th>
+            <th>Note</th>
+            <th>Commentaire / Appréciation</th>
+            <th>Date de saisie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let note of notesDetails; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ note.eleve }} {{ note.prenom }}</td>
+            <td>{{ note.matricule }}</td>
+            <td>
+              <span class="note-value" [ngClass]="{
+                'note-excellent': note.note >= 16,
+                'note-bon': note.note >= 14 && note.note < 16,
+                'note-moyen': note.note >= 12 && note.note < 14,
+                'note-passable': note.note >= 10 && note.note < 12,
+                'note-insuffisant': note.note < 10
+              }">
+                {{ note.note }}/20
+              </span>
+            </td>
+            <td>{{ note.appreciation }}</td>
+            <td>{{ note.date_saisie }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- États de chargement et d'erreur -->
+    <div *ngIf="loading" class="text-center p-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Chargement...</span>
+      </div>
+      <p class="mt-2">Chargement des notes...</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error && notesDetails.length === 0" class="text-center p-4">
+      <p class="text-muted">Aucune note disponible pour cette classe/matière/période</p>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,433 @@
+/* Variables de couleurs */
+:root {
+  --primary-color: #48b4bb;
+  --primary-light: #36cbad;
+  --primary-very-light: #4ee1be;
+  --secondary-color: #06697b;
+  --light-bg: #d9e7e8;
+  --white: #ffffff;
+  --light-gray: #f5f5f5;
+  --dark-gray: #333333;
+  --border-color: #e0e0e0;
+  --hover-color: #3a9ba3;
+}
+
+/* Container principal */
+.affectation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--light-gray);
+  min-height: 100vh;
+}
+
+/* Section liste */
+.list-section {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+/* En-tête de la liste */
+.list-header {
+  background: var(--primary-color);
+  color: var(--white);
+  padding: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-header h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.btn-ajouter {
+  background: var(--primary-light);
+  color: var(--white);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-ajouter:hover {
+  background: var(--primary-very-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(72, 180, 187, 0.3);
+}
+
+/* Barre de recherche */
+.search-bar {
+  padding: 25px;
+  background: var(--light-bg);
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-bar input,
+.search-bar select {
+  padding: 12px 18px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--white);
+  transition: all 0.3s ease;
+}
+
+.search-bar input:focus,
+.search-bar select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(72, 180, 187, 0.1);
+}
+
+.search-bar input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-bar select {
+  min-width: 150px;
+}
+
+/* Liste des affectations */
+.affectations-list {
+  padding: 25px;
+}
+
+.affectation-card {
+  background: var(--white);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.affectation-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 25px rgba(72, 180, 187, 0.15);
+  transform: translateY(-3px);
+}
+
+.affectation-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.affectation-info h3 {
+  margin: 0 0 12px 0;
+  color: var(--primary-color);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.affectation-details {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.matiere {
+  background: var(--light-bg);
+  color: var(--secondary-color);
+  padding: 6px 14px;
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.classe {
+  background: var(--primary-light);
+  color: var(--white);
+  padding: 6px 14px;
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.date {
+  color: var(--dark-gray);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.affectation-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* BOUTONS AVEC COULEURS DISTINCTES */
+.btn-voir,
+.btn-modifier,
+.btn-supprimer {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  color: var(--white);
+}
+
+.btn-voir {
+  background: #48b4bb; /* Teal/blue-green */
+}
+
+.btn-voir:hover {
+  background: #3a9ba3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(72, 180, 187, 0.3);
+}
+
+.btn-modifier {
+  background: #ff8c42; /* Orange */
+}
+
+.btn-modifier:hover {
+  background: #ff7a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+}
+
+.btn-supprimer {
+  background: #ff6b6b; /* Red */
+}
+
+.btn-supprimer:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+/* État vide */
+.empty-state {
+  text-align: center;
+  padding: 50px 25px;
+  color: var(--dark-gray);
+}
+
+.empty-state p {
+  margin-bottom: 25px;
+  font-size: 18px;
+}
+
+/* Chargement */
+.loading {
+  text-align: center;
+  padding: 50px 25px;
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+/* Section formulaire - DESIGN SIMPLE AVEC BORDURES VISIBLES */
+.form-section {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  max-width: 500px;
+  margin: 0 auto;
+  border: 3px solid var(--primary-color);
+}
+
+.form-header {
+  background: var(--primary-color);
+  color: var(--white);
+  padding: 30px;
+  text-align: center;
+}
+
+.form-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.btn-retour {
+  background: var(--primary-light);
+  color: var(--white);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+}
+
+.btn-retour:hover {
+  background: var(--primary-very-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(72, 180, 187, 0.3);
+}
+
+/* Formulaire - DESIGN SIMPLE AVEC BORDURES VISIBLES */
+.affectation-form {
+  padding: 40px;
+  background: var(--white);
+}
+
+.form-group {
+  margin-bottom: 30px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--secondary-color);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 15px 20px;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  font-size: 16px;
+  background: var(--white);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  color: var(--dark-gray);
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(72, 180, 187, 0.2);
+}
+
+.form-group select.ng-invalid.ng-touched {
+  border-color: #ff6b6b;
+  background: #fff5f5;
+}
+
+.form-group select::placeholder {
+  color: #999;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Actions du formulaire - BOUTONS BIEN VISIBLES */
+.form-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 2px solid var(--light-bg);
+}
+
+.btn-annuler {
+  background: var(--light-bg);
+  color: var(--secondary-color);
+  border: 2px solid var(--primary-color);
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btn-annuler:hover {
+  background: var(--primary-very-light);
+  color: var(--white);
+  border-color: var(--primary-very-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(78, 225, 190, 0.3);
+}
+
+.form-actions .btn-ajouter {
+  padding: 15px 30px;
+  font-size: 16px;
+  background: var(--primary-color);
+  color: var(--white);
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  min-width: 120px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-actions .btn-ajouter:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(72, 180, 187, 0.3);
+}
+
+.form-actions .btn-ajouter:disabled {
+  background: var(--border-color);
+  color: var(--dark-gray);
+  border-color: var(--border-color);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .affectation-container {
+    padding: 15px;
+  }
+  
+  .list-header,
+  .form-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .search-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .affectation-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .affectation-actions {
+    justify-content: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .affectation-form {
+    padding: 25px;
+  }
+}
